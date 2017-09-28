@@ -36,6 +36,28 @@
 
 ```
 
+```
+wv_number.setAdapter(new WheelView.WheelAdapter() {
+            @Override
+            protected int getItemCount() {
+                return 100;
+            }
+
+            @Override
+            protected String getItem(int index) {
+                return String.valueOf(index);
+            }
+        });
+        wv_number.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(int index) {
+                tv_number.setText("水平布局"+index);
+            }
+        });
+        wv_number.setCurrentItem(88);
+
+```
+
 ### 项目博客地址 http://www.jianshu.com/u/b1cff340957c
 
 

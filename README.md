@@ -1,6 +1,7 @@
 # WheelView-3d
 ### Camera, Matrix 实现WheelView 3d效果
 
+### 项目博客地址 http://www.jianshu.com/u/b1cff340957c
 
 ![纵向排列](https://github.com/youxiaochen/WheelView-3d/blob/master/imgs/GIF111.gif)
 
@@ -35,7 +36,7 @@
 
 ```
 
-# 项目博客地址 http://www.jianshu.com/u/b1cff340957c
+### 项目博客地址 http://www.jianshu.com/u/b1cff340957c
 
 
 

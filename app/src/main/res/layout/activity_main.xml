@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="18sp"
+        android:text="垂直布局"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView android:id="@+id/tv_city"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="选择的市"/>
+
+            <TextView android:id="@+id/tv_county"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:hint="选择的县"/>
+
+        </LinearLayout>
+
+
+        <you.xiaochen.wheel.widget.WheelView
+            android:id="@+id/wv_city"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:wheelItemCount="3"
+            app:wheelItemSize="35dp"
+            app:wheelDividerSize="38dp"
+            app:wheelTextSize="18sp"/>
+
+        <you.xiaochen.wheel.widget.WheelView
+            android:id="@+id/wv_county"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:wheelItemCount="3"
+            app:wheelItemSize="35dp"
+            app:wheelDividerSize="38dp"
+            app:wheelTextSize="18sp"/>
+
+    </LinearLayout>
+
+    <TextView android:id="@+id/tv_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="18sp"
+        android:text="水平布局88"/>
+
+    <you.xiaochen.wheel.widget.WheelView
+        android:id="@+id/wv_number"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        app:wheelItemCount="3"
+        app:wheelItemSize="35dp"
+        app:wheelDividerSize="38dp"
+        app:wheelOrientation="horizontal"
+        app:wheelTextSize="25sp"/>
+
+</LinearLayout>

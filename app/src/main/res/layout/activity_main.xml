@@ -42,9 +42,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            app:wheelItemCount="3"
-            app:wheelItemSize="35dp"
-            app:wheelDividerSize="38dp"
+            app:wheelItemCount="4"
+            app:wheelItemSize="30dp"
+            app:wheelDividerSize="32dp"
             app:wheelTextSize="18sp"/>
 
         <you.xiaochen.wheel.widget.WheelView
@@ -52,9 +52,9 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            app:wheelItemCount="3"
-            app:wheelItemSize="35dp"
-            app:wheelDividerSize="38dp"
+            app:wheelItemCount="4"
+            app:wheelItemSize="30dp"
+            app:wheelDividerSize="32dp"
             app:wheelTextSize="18sp"/>
 
     </LinearLayout>

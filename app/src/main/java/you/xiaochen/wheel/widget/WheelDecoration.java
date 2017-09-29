@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -115,8 +116,14 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
         }
 
         c.save();
-        c.translate(0.0f, -rotateOffY);
+        c.translate(0.0f, -rotateOffY);//因旋转导致界面视角的偏移
         camera.save();
+
+        //旋转时离视角的z轴方向也会变化,先移动Z轴再旋转
+        float z = (float) (wheelRadio * (1 - Math.abs(Math.cos(Math.toRadians(rotateDegreeX)))));
+        camera.translate(0, 0, z);
+
+
         camera.rotateX(-rotateDegreeX);
         camera.getMatrix(matrix);
         camera.restore();
@@ -158,6 +165,10 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
         c.save();
         c.translate(-rotateOffX, 0.0f);
         camera.save();
+
+        float z = (float) (wheelRadio * (1 - Math.abs(Math.cos(Math.toRadians(rotateDegreeY)))));
+        camera.translate(0, 0, z);
+
         camera.rotateY(rotateDegreeY);
         camera.getMatrix(matrix);
         camera.restore();

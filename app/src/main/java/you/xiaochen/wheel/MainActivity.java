@@ -11,7 +11,7 @@ import java.util.List;
 import you.xiaochen.wheel.widget.WheelView;
 
 public class MainActivity extends AppCompatActivity {
-    private WheelView wv_city, wv_county;
+    private WheelView wv_city, wv_county, wv_name;
 
     private CityAdapter cityAdapter;
     private CountyAdapter countyAdapter;
@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         wv_city = (WheelView) findViewById(R.id.wv_city);
         wv_county = (WheelView) findViewById(R.id.wv_county);
         wv_number = (WheelView) findViewById(R.id.wv_number);
+        wv_name = (WheelView) findViewById(R.id.wv_name);
         tv_city = (TextView) findViewById(R.id.tv_city);
         tv_county = (TextView) findViewById(R.id.tv_county);
         tv_number = (TextView) findViewById(R.id.tv_number);
@@ -64,7 +65,18 @@ public class MainActivity extends AppCompatActivity {
         countyAdapter = new CountyAdapter();
         wv_county.setAdapter(countyAdapter);
 
+        /*  名字适配  */
+        wv_name.setAdapter(new WheelView.WheelAdapter() {
+            @Override
+            protected int getItemCount() {
+                return 20;
+            }
 
+            @Override
+            protected String getItem(int index) {
+                return "游小陈";
+            }
+        });
 
         /* 水平滑轮控件 */
         wv_number.setAdapter(new WheelView.WheelAdapter() {

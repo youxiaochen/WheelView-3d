@@ -58,6 +58,10 @@ public class WheelView extends FrameLayout {
      * 布局方向
      */
     private int orientation = WHEEL_VERTICAL;
+    /**
+     * 对齐方式
+     */
+    private int gravity = WheelDecoration.GRAVITY_CENTER;
 
     /**
      * recyclerView
@@ -103,6 +107,7 @@ public class WheelView extends FrameLayout {
             itemSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelItemSize, itemSize);
             dividerSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelDividerSize, dividerSize);
             orientation = a.getInt(R.styleable.WheelView_wheelOrientation, orientation);
+            gravity = a.getInt(R.styleable.WheelView_wheelGravity, gravity);
             a.recycle();
         }
         initRecyclerView(context);
@@ -121,7 +126,7 @@ public class WheelView extends FrameLayout {
         this.addView(mRecyclerView, WheelUtils.createLayoutParams(orientation, totolItemSize));
 
         wheelAdapter = new WheelViewAdapter(orientation, itemSize, itemCount);
-        wheelDecoration = new SimpleWheelDecoration(wheelAdapter, textColor, textColorCenter, textSize, dividerColor, dividerSize);
+        wheelDecoration = new SimpleWheelDecoration(wheelAdapter, gravity, textColor, textColorCenter, textSize, dividerColor, dividerSize);
         mRecyclerView.addItemDecoration(wheelDecoration);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

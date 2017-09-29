@@ -1,8 +1,11 @@
 package you.xiaochen.wheel.widget;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Shader;
 
 /**
  * Created by you on 2017/9/26.
@@ -27,8 +30,8 @@ class SimpleWheelDecoration extends WheelDecoration {
 
     private final WheelViewAdapter adapter;
 
-    SimpleWheelDecoration(WheelViewAdapter adapter, int textColor, int textColorCenter, float textSize, int dividerColor, int dividerSize) {
-        super(adapter.itemCount, adapter.itemSize);
+    SimpleWheelDecoration(WheelViewAdapter adapter, int gravity, int textColor, int textColorCenter, float textSize, int dividerColor, int dividerSize) {
+        super(adapter.itemCount, adapter.itemSize, gravity);
         this.textColor = textColor;
         this.textColorCenter = textColorCenter;
         this.dividerSize = dividerSize;
@@ -71,4 +74,5 @@ class SimpleWheelDecoration extends WheelDecoration {
             c.drawLine(secondX, rect.top, secondX, rect.bottom, dividerPaint);
         }
     }
+
 }

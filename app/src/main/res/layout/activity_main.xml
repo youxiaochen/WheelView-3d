@@ -19,7 +19,7 @@
         android:gravity="center_vertical">
 
         <LinearLayout
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
@@ -43,9 +43,10 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             app:wheelItemCount="4"
-            app:wheelItemSize="30dp"
-            app:wheelDividerSize="32dp"
-            app:wheelTextSize="18sp"/>
+            app:wheelItemSize="28dp"
+            app:wheelDividerSize="30dp"
+            app:wheelGravity="left"
+            app:wheelTextSize="16sp"/>
 
         <you.xiaochen.wheel.widget.WheelView
             android:id="@+id/wv_county"
@@ -53,9 +54,21 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             app:wheelItemCount="4"
-            app:wheelItemSize="30dp"
-            app:wheelDividerSize="32dp"
-            app:wheelTextSize="18sp"/>
+            app:wheelItemSize="28dp"
+            app:wheelDividerSize="30dp"
+            app:wheelGravity="center"
+            app:wheelTextSize="16sp"/>
+
+        <you.xiaochen.wheel.widget.WheelView
+            android:id="@+id/wv_name"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            app:wheelItemCount="4"
+            app:wheelItemSize="28dp"
+            app:wheelDividerSize="30dp"
+            app:wheelGravity="right"
+            app:wheelTextSize="16sp"/>
 
     </LinearLayout>
 

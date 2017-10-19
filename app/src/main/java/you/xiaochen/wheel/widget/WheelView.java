@@ -7,7 +7,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import you.xiaochen.wheel.R;
 
@@ -16,7 +19,7 @@ import you.xiaochen.wheel.R;
  * 作QQ:86207610
  */
 
-public class WheelView extends FrameLayout {
+public class WheelView extends ViewGroup {
     /**
      * 无效的位置
      */
@@ -141,6 +144,77 @@ public class WheelView extends FrameLayout {
             }
         });
         mRecyclerView.setAdapter(wheelAdapter);
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (getChildCount() <= 0) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+        measureChildren(widthMeasureSpec, heightMeasureSpec);
+        if (orientation == WHEEL_HORIZONTAL) {//水平布局时,最好固定高度,垂直布局时最好固定宽度
+            measureHorizontal(widthMeasureSpec, heightMeasureSpec);
+        } else {
+            measureVertical(widthMeasureSpec, heightMeasureSpec);
+        }
+    }
+
+    private void measureHorizontal(int widthMeasureSpec, int heightMeasureSpec) {
+        int width, height;
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        if (widthMode == MeasureSpec.EXACTLY) {
+            width = MeasureSpec.getSize(widthMeasureSpec);
+        } else {
+            View child = getChildAt(0);
+            width = child.getMeasuredWidth() + getPaddingLeft() + getPaddingRight();
+        }
+        if (heightMode == MeasureSpec.EXACTLY) {
+            height = MeasureSpec.getSize(heightMeasureSpec);
+        } else {
+            height = itemSize + getPaddingTop() + getPaddingBottom();
+        }
+        setMeasuredDimension(width, height);
+    }
+
+    private void measureVertical(int widthMeasureSpec, int heightMeasureSpec) {
+        int width, height;
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        if (heightMode == MeasureSpec.EXACTLY) {
+            height = MeasureSpec.getSize(heightMeasureSpec);
+        } else {
+            View child = getChildAt(0);
+            height = child.getMeasuredHeight() + getPaddingTop() + getPaddingBottom();
+        }
+        if (widthMode == MeasureSpec.EXACTLY) {
+            width = MeasureSpec.getSize(widthMeasureSpec);
+        } else {
+            width = itemSize + getPaddingLeft() + getPaddingRight();
+        }
+        setMeasuredDimension(width, height);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (getChildCount() <= 0) {
+            return;
+        }
+        View child = getChildAt(0);
+        int childWidth = child.getMeasuredWidth();
+        int childHeight = child.getMeasuredHeight();
+        int left, top;
+        if (orientation == WHEEL_HORIZONTAL) {//水平布局时,最好固定高度,垂直布局时最好固定宽度
+            int centerWidth = (getWidth() - getPaddingLeft() - getPaddingRight() - childWidth) >> 1;
+            left = getPaddingLeft() + centerWidth;
+            top = getPaddingTop();
+        } else {
+            int centerHeight = (getHeight() - getPaddingTop() - getPaddingBottom() - childHeight) >> 1;
+            left = getPaddingLeft();
+            top = getPaddingTop() + centerHeight;
+        }
+        child.layout(left, top, left + childWidth, top + childHeight);
     }
 
     public void setAdapter(WheelAdapter adapter) {

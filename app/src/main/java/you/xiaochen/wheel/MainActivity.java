@@ -97,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         wv_number.setCurrentItem(88);
+
+        //Activity2.lanuch(this);
     }
 
     private class CityAdapter extends WheelView.WheelAdapter {

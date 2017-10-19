@@ -110,9 +110,9 @@
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_gravity="center_horizontal"
-        app:wheelItemCount="3"
-        app:wheelItemSize="35dp"
-        app:wheelDividerSize="38dp"
+        app:wheelItemCount="6"
+        app:wheelItemSize="45dp"
+        app:wheelDividerSize="48dp"
         app:wheelOrientation="horizontal"
         app:wheelTextSize="25sp"/>
 

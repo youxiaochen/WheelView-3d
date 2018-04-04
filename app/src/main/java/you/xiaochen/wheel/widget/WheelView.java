@@ -226,7 +226,7 @@ public class WheelView extends ViewGroup {
     }
 
     public WheelAdapter getAdapter() {
-        return adapter;
+        return wheelAdapter.adapter;
     }
 
     public void setCurrentItem(int position) {

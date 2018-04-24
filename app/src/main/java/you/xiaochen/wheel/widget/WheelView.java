@@ -9,8 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import you.xiaochen.wheel.R;
 
@@ -119,14 +120,14 @@ public class WheelView extends ViewGroup {
     private void initRecyclerView(Context context) {
         mRecyclerView = new RecyclerView(context);
         mRecyclerView.setOverScrollMode(OVER_SCROLL_NEVER);
-        int totolItemSize = (itemCount * 2 + 1) * itemSize;
+        int totalItemSize = (itemCount * 2 + 1) * itemSize;
         layoutManager = new LinearLayoutManager(context);
         layoutManager.setOrientation(orientation == WHEEL_VERTICAL ?
                 LinearLayoutManager.VERTICAL : LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(layoutManager);
         //让滑动结束时都能定到中心位置
         new LinearSnapHelper().attachToRecyclerView(mRecyclerView);
-        this.addView(mRecyclerView, WheelUtils.createLayoutParams(orientation, totolItemSize));
+        this.addView(mRecyclerView, WheelUtils.createLayoutParams(orientation, totalItemSize));
 
         wheelAdapter = new WheelViewAdapter(orientation, itemSize, itemCount);
         wheelDecoration = new SimpleWheelDecoration(wheelAdapter, gravity, textColor, textColorCenter, textSize, dividerColor, dividerSize);
@@ -138,7 +139,7 @@ public class WheelView extends ViewGroup {
                 if (wheelDecoration.centerItemPosition == IDLE_POSITION || newState != RecyclerView.SCROLL_STATE_IDLE) return;
                 selectedPosition = wheelDecoration.centerItemPosition;
                 if (selectedPosition != lastSelectedPosition) {
-                    listener.onItemSelected(wheelDecoration.centerItemPosition);
+                    listener.onItemSelected(WheelView.this, wheelDecoration.centerItemPosition);
                     lastSelectedPosition = selectedPosition;
                 }
             }
@@ -243,11 +244,42 @@ public class WheelView extends ViewGroup {
         this.listener = listener;
     }
 
+    public static class SimpleAdapter extends WheelView.WheelAdapter {
+
+        private List<String> strings = new ArrayList<>();
+
+        public void add(String s) {
+            strings.add(s);
+        }
+
+        public void addAll(List<String> list) {
+            strings.addAll(list);
+        }
+
+        public void clear() {
+            strings.clear();
+        }
+
+        public int size() {
+            return strings.size();
+        }
+
+        @Override
+        protected int getItemCount() {
+            return strings.size();
+        }
+
+        @Override
+        protected String getItem(int index) {
+            return strings.get(index);
+        }
+    }
+
     /**
      * item selected
      */
     public interface OnItemSelectedListener {
-        void onItemSelected(int index);
+        void onItemSelected(WheelView wheelView, int index);
     }
 
     /**

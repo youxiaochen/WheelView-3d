@@ -2,24 +2,28 @@ package you.xiaochen.wheel;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
+import you.xiaochen.wheel.widget.DatePickerDialog;
 import you.xiaochen.wheel.widget.WheelView;
 
 public class MainActivity extends AppCompatActivity {
     private WheelView wv_city, wv_county, wv_name;
+    private WheelView wv_number;
 
     private CityAdapter cityAdapter;
     private CountyAdapter countyAdapter;
 
-    private TextView tv_city, tv_county, tv_number;
+    private TextView tv_city, tv_county, tv_number, tvDatePicker;
 
+    private DatePickerDialog dialog;
 
-    private WheelView wv_number;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,13 +38,15 @@ public class MainActivity extends AppCompatActivity {
         tv_county = (TextView) findViewById(R.id.tv_county);
         tv_number = (TextView) findViewById(R.id.tv_number);
 
+        tvDatePicker = (TextView) findViewById(R.id.datePicker);
+
         /* 市滑轮控件 */
 
         cityAdapter = new CityAdapter();
         wv_city.setAdapter(cityAdapter);
         wv_city.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int index) {
+            public void onItemSelected(WheelView wheelView, int index) {
                 tv_city.setText("市: "+cityAdapter.getItem(index));
                 List<String> strs = Arrays.asList(TestDatas.AREAS[index]);
                 countyAdapter.strs.clear();
@@ -54,10 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         /* 区滑轮控件 */
-
         wv_county.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int index) {
+            public void onItemSelected(WheelView wheelView, int index) {
                 tv_county.setText("县: "+countyAdapter.getItem(index));
             }
         });
@@ -92,16 +97,37 @@ public class MainActivity extends AppCompatActivity {
         });
         wv_number.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int index) {
+            public void onItemSelected(WheelView wheelView, int index) {
                 tv_number.setText("水平布局"+index);
             }
         });
         wv_number.setCurrentItem(88);
 
+
+        dialog = new DatePickerDialog(this);
+        dialog.setDate(Calendar.getInstance(), false);
+        dialog.setOnDateSelectedListener(new DatePickerDialog.OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(int year, int month, int dayOfMonth) {
+                tvDatePicker.setText(String.format("%s年%s月%s日", year, month + 1, dayOfMonth));
+            }
+        });
+
         //Activity2.lanuch(this);
     }
 
-    private class CityAdapter extends WheelView.WheelAdapter {
+    public void viewClick(View view) {
+        String tag = (String) view.getTag();
+        switch (tag) {
+            case "WheelRecyclerView":
+                Activity2.lanuch(this);
+                break;
+            default:
+                dialog.show();
+        }
+    }
+
+    private static class CityAdapter extends WheelView.WheelAdapter {
         @Override
         protected int getItemCount() {
             return TestDatas.NAMES.length;
@@ -113,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class CountyAdapter extends WheelView.WheelAdapter {
+    private static class CountyAdapter extends WheelView.WheelAdapter {
         private List<String> strs;
 
         CountyAdapter() {
@@ -130,6 +156,5 @@ public class MainActivity extends AppCompatActivity {
             return strs.get(index);
         }
     }
-
 
 }

@@ -97,11 +97,12 @@
 
     </LinearLayout>
 
-    <TextView android:id="@+id/tv_number"
+    <TextView
+        android:id="@+id/tv_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:textSize="18sp"
         android:text="水平布局88"/>
 
@@ -115,5 +116,25 @@
         app:wheelDividerSize="48dp"
         app:wheelOrientation="horizontal"
         app:wheelTextSize="25sp"/>
+
+    <TextView
+        android:id="@+id/datePicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:textSize="18sp"
+        android:text="日期选择"
+        android:onClick="viewClick"/>
+
+    <TextView
+        android:tag="WheelRecyclerView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:textSize="18sp"
+        android:text="WheelRecyclerView"
+        android:onClick="viewClick"/>
 
 </LinearLayout>

@@ -118,12 +118,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void viewClick(View view) {
         String tag = (String) view.getTag();
-        switch (tag) {
-            case "WheelRecyclerView":
-                Activity2.lanuch(this);
-                break;
-            default:
-                dialog.show();
+        if ("WheelRecyclerView".equals(tag)) {
+            Activity2.lanuch(this);
+        } else {
+            dialog.show();
         }
     }
 

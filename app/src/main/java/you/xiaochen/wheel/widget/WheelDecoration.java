@@ -3,11 +3,9 @@ package you.xiaochen.wheel.widget;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -23,13 +21,13 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
     static final int GRAVITY_CENTER = 2;
     static final int GRAVITY_RIGHT = 3;
     /**
-     * 此参数影响左右旋转对齐时的效果,系数越大,越明显,自己体会......(0-1之间)
-     */
-    static final float DEF_SCALE = 0.75F;
-    /**
      * 无效的位置
      */
     public static final int IDLE_POSITION = -1;
+    /**
+     * 告左或靠右立体时的偏移系数 必须大于0
+     */
+    final float gravityCoefficient;
     /**
      * 显示的item数量
      */
@@ -65,13 +63,14 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
 
     int centerItemPosition = IDLE_POSITION;
 
-    WheelDecoration(int itemCount, int itemSize, int gravity) {
+    WheelDecoration(int itemCount, int itemSize, int gravity, float gravityCoefficient) {
         this.itemCount = itemCount;
         this.itemSize = itemSize;
         this.halfItemHeight = itemSize / 2.0f;
         this.itemDegree = 180.f / (itemCount * 2 + 1);
         this.gravity = gravity;
         wheelRadio = (float) WheelUtils.radianToRadio(itemSize, itemDegree);
+        this.gravityCoefficient = gravityCoefficient;
 
         camera = new Camera();
         matrix = new Matrix();
@@ -95,27 +94,12 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
             View itemView = llm.findViewByPosition(itemPosition);
             Rect itemRect = new Rect(itemView.getLeft(), itemView.getTop(), itemView.getRight(), itemView.getBottom());
             if (isVertical) {//垂直布局, 还需要靠对齐方式
-                drawVerticalItem(c, itemRect, itemPosition, translateX(parentRect), parentRect.exactCenterY());
+                drawVerticalItem(c, itemRect, itemPosition, parentRect.exactCenterX(), parentRect.exactCenterY());
             } else {//水平布局
                 drawHorizontalItem(c, itemRect, itemPosition, parentRect.exactCenterX(), parentRect.exactCenterY());
             }
         }
         drawDivider(c, parentRect, isVertical);
-    }
-
-    /**
-     * 根据对齐方式,计算出垂直布局时X轴移动的位置
-     * @return
-     */
-    private float translateX(Rect parentRect) {
-        float parentCenterX = parentRect.exactCenterX();
-        switch (gravity) {
-            case GRAVITY_LEFT:
-                return parentCenterX * (1 + DEF_SCALE);
-            case GRAVITY_RIGHT:
-                return parentCenterX * (1 - DEF_SCALE);
-        }
-        return parentCenterX;
     }
 
     /**
@@ -147,12 +131,15 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
         }
 
         c.save();
-        c.translate(0.0f, -rotateOffY);//因旋转导致界面视角的偏移
+
+
+        c.translate(0f, -rotateOffY);//因旋转导致界面视角的偏移
         camera.save();
 
         //旋转时离视角的z轴方向也会变化,先移动Z轴再旋转
         float z = (float) (wheelRadio * (1 - Math.abs(Math.cos(Math.toRadians(rotateDegreeX)))));
-        camera.translate(0, 0, z);
+
+        camera.translate(translateX(Math.abs(rotateDegreeX)), 0, z);
 
 
         camera.rotateX(-rotateDegreeX);
@@ -163,6 +150,24 @@ abstract class WheelDecoration extends RecyclerView.ItemDecoration {
         c.concat(matrix);
         drawItem(c, rect, realPosition, alpha, isCenterItem, true);
         c.restore();
+    }
+
+    /**
+     * 根据旋转计算出X轴的偏移
+     * @param rotateDegreeX
+     * @return
+     */
+    private float translateX(float rotateDegreeX) {
+        if (rotateDegreeX >= 90) rotateDegreeX = 90f;
+        switch (gravity) {
+            case GRAVITY_LEFT:
+
+                return -(1 - rotateDegreeX / 90f) * itemSize * gravityCoefficient;
+            case GRAVITY_RIGHT:
+                return (1 - rotateDegreeX / 90f) * itemSize * gravityCoefficient;
+            default:
+                return 0;
+        }
     }
 
     /**

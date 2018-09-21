@@ -26,6 +26,8 @@
             <enum name="right" value="3"/>
         </attr>
 
+        <attr name="gravityCoefficient" format="float"/>
+
         <!-- 两根分割线的距离 -->
         <attr name="wheelDividerSize" format="dimension"/>
     </declare-styleable>

@@ -71,6 +71,7 @@
             app:wheelItemSize="28dp"
             app:wheelDividerSize="30dp"
             app:wheelGravity="left"
+            app:gravityCoefficient="0.6"
             app:wheelTextSize="18sp"/>
 
         <you.xiaochen.wheel.widget.WheelView
@@ -93,6 +94,7 @@
             app:wheelItemSize="28dp"
             app:wheelDividerSize="30dp"
             app:wheelGravity="right"
+            app:gravityCoefficient="0.6"
             app:wheelTextSize="18sp"/>
 
     </LinearLayout>

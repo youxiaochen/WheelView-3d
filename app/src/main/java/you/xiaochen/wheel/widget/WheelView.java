@@ -58,6 +58,10 @@ public class WheelView extends ViewGroup {
      */
     private int dividerSize = 90;
     /**
+     * 告左或靠右立体时的偏移系数 必须大于0, 默认0.5F
+     */
+    private float gravityCoefficient = 0.5f;
+    /**
      * 布局方向
      */
     private int orientation = WHEEL_VERTICAL;
@@ -111,7 +115,11 @@ public class WheelView extends ViewGroup {
             dividerSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelDividerSize, dividerSize);
             orientation = a.getInt(R.styleable.WheelView_wheelOrientation, orientation);
             gravity = a.getInt(R.styleable.WheelView_wheelGravity, gravity);
+            gravityCoefficient = a.getFloat(R.styleable.WheelView_gravityCoefficient, gravityCoefficient);
             a.recycle();
+        }
+        if (gravityCoefficient < 0) {
+            gravityCoefficient = 0;
         }
         initRecyclerView(context);
     }
@@ -129,7 +137,7 @@ public class WheelView extends ViewGroup {
         this.addView(mRecyclerView, WheelUtils.createLayoutParams(orientation, totolItemSize));
 
         wheelAdapter = new WheelViewAdapter(orientation, itemSize, itemCount);
-        wheelDecoration = new SimpleWheelDecoration(wheelAdapter, gravity, textColor, textColorCenter, textSize, dividerColor, dividerSize);
+        wheelDecoration = new SimpleWheelDecoration(wheelAdapter, gravity, gravityCoefficient, textColor, textColorCenter, textSize, dividerColor, dividerSize);
         mRecyclerView.addItemDecoration(wheelDecoration);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override

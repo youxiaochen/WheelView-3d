@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         wv_city.setAdapter(cityAdapter);
         wv_city.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int index) {
+            public void onItemSelected(WheelView wv, int index) {
                 tv_city.setText("市: "+cityAdapter.getItem(index));
                 List<String> strs = Arrays.asList(TestDatas.AREAS[index]);
                 countyAdapter.strs.clear();
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         wv_county.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int index) {
+            public void onItemSelected(WheelView wv, int index) {
                 tv_county.setText("县: "+countyAdapter.getItem(index));
             }
         });
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         });
         wv_number.setOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(int index) {
+            public void onItemSelected(WheelView wv, int index) {
                 tv_number.setText("水平布局"+index);
             }
         });

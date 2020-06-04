@@ -2,15 +2,13 @@ package you.xiaochen.wheel.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import you.xiaochen.wheel.R;
 
@@ -19,7 +17,7 @@ import you.xiaochen.wheel.R;
  * 作QQ:86207610
  */
 
-public class WheelView extends ViewGroup {
+public class WheelView extends FrameLayout {
     /**
      * 无效的位置
      */
@@ -58,10 +56,6 @@ public class WheelView extends ViewGroup {
      */
     private int dividerSize = 90;
     /**
-     * 告左或靠右立体时的偏移系数 必须大于0, 默认0.5F
-     */
-    private float gravityCoefficient = 0.5f;
-    /**
      * 布局方向
      */
     private int orientation = WHEEL_VERTICAL;
@@ -83,7 +77,10 @@ public class WheelView extends ViewGroup {
     /**
      * adapter
      */
-    private WheelAdapter adapter;
+    private WheelAdapter mAdapter;
+    private WheelViewObserver observer;
+
+    private WheelItemClickListener itemClickListener;
 
     private int lastSelectedPosition = IDLE_POSITION;
     private int selectedPosition = IDLE_POSITION;
@@ -109,17 +106,13 @@ public class WheelView extends ViewGroup {
             itemCount = a.getInt(R.styleable.WheelView_wheelItemCount, itemCount);
             textColor = a.getColor(R.styleable.WheelView_wheelTextColor, textColor);
             textColorCenter = a.getColor(R.styleable.WheelView_wheelTextColorCenter, textColorCenter);
-            dividerColor = a.getColor(R.styleable.WheelView_dividerColor, dividerColor);
+            dividerColor = a.getColor(R.styleable.WheelView_wheelDividerColor, dividerColor);
             textSize = a.getDimension(R.styleable.WheelView_wheelTextSize, textSize);
             itemSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelItemSize, itemSize);
             dividerSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelDividerSize, dividerSize);
             orientation = a.getInt(R.styleable.WheelView_wheelOrientation, orientation);
             gravity = a.getInt(R.styleable.WheelView_wheelGravity, gravity);
-            gravityCoefficient = a.getFloat(R.styleable.WheelView_gravityCoefficient, gravityCoefficient);
             a.recycle();
-        }
-        if (gravityCoefficient < 0) {
-            gravityCoefficient = 0;
         }
         initRecyclerView(context);
     }
@@ -137,7 +130,7 @@ public class WheelView extends ViewGroup {
         this.addView(mRecyclerView, WheelUtils.createLayoutParams(orientation, totolItemSize));
 
         wheelAdapter = new WheelViewAdapter(orientation, itemSize, itemCount);
-        wheelDecoration = new SimpleWheelDecoration(wheelAdapter, gravity, gravityCoefficient, textColor, textColorCenter, textSize, dividerColor, dividerSize);
+        wheelDecoration = new SimpleWheelDecoration(wheelAdapter, gravity, textColor, textColorCenter, textSize, dividerColor, dividerSize);
         mRecyclerView.addItemDecoration(wheelDecoration);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -146,7 +139,7 @@ public class WheelView extends ViewGroup {
                 if (wheelDecoration.centerItemPosition == IDLE_POSITION || newState != RecyclerView.SCROLL_STATE_IDLE) return;
                 selectedPosition = wheelDecoration.centerItemPosition;
                 if (selectedPosition != lastSelectedPosition) {
-                    listener.onItemSelected(wheelDecoration.centerItemPosition);
+                    listener.onItemSelected(WheelView.this, selectedPosition);
                     lastSelectedPosition = selectedPosition;
                 }
             }
@@ -154,87 +147,29 @@ public class WheelView extends ViewGroup {
         mRecyclerView.setAdapter(wheelAdapter);
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (getChildCount() <= 0) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            return;
-        }
-        measureChildren(widthMeasureSpec, heightMeasureSpec);
-        if (orientation == WHEEL_HORIZONTAL) {//水平布局时,最好固定高度,垂直布局时最好固定宽度
-            measureHorizontal(widthMeasureSpec, heightMeasureSpec);
-        } else {
-            measureVertical(widthMeasureSpec, heightMeasureSpec);
-        }
-    }
-
-    private void measureHorizontal(int widthMeasureSpec, int heightMeasureSpec) {
-        int width, height;
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        if (widthMode == MeasureSpec.EXACTLY) {
-            width = MeasureSpec.getSize(widthMeasureSpec);
-        } else {
-            View child = getChildAt(0);
-            width = child.getMeasuredWidth() + getPaddingLeft() + getPaddingRight();
-        }
-        if (heightMode == MeasureSpec.EXACTLY) {
-            height = MeasureSpec.getSize(heightMeasureSpec);
-        } else {
-            height = itemSize + getPaddingTop() + getPaddingBottom();
-        }
-        setMeasuredDimension(width, height);
-    }
-
-    private void measureVertical(int widthMeasureSpec, int heightMeasureSpec) {
-        int width, height;
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-        if (heightMode == MeasureSpec.EXACTLY) {
-            height = MeasureSpec.getSize(heightMeasureSpec);
-        } else {
-            View child = getChildAt(0);
-            height = child.getMeasuredHeight() + getPaddingTop() + getPaddingBottom();
-        }
-        if (widthMode == MeasureSpec.EXACTLY) {
-            width = MeasureSpec.getSize(widthMeasureSpec);
-        } else {
-            width = itemSize + getPaddingLeft() + getPaddingRight();
-        }
-        setMeasuredDimension(width, height);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (getChildCount() <= 0) {
-            return;
-        }
-        View child = getChildAt(0);
-        int childWidth = child.getMeasuredWidth();
-        int childHeight = child.getMeasuredHeight();
-        int left, top;
-        if (orientation == WHEEL_HORIZONTAL) {//水平布局时,最好固定高度,垂直布局时最好固定宽度
-            int centerWidth = (getWidth() - getPaddingLeft() - getPaddingRight() - childWidth) >> 1;
-            left = getPaddingLeft() + centerWidth;
-            top = getPaddingTop();
-        } else {
-            int centerHeight = (getHeight() - getPaddingTop() - getPaddingBottom() - childHeight) >> 1;
-            left = getPaddingLeft();
-            top = getPaddingTop() + centerHeight;
-        }
-        child.layout(left, top, left + childWidth, top + childHeight);
-    }
-
     public void setAdapter(WheelAdapter adapter) {
-        this.selectedPosition = -1;
-        this.lastSelectedPosition = -1;
-        this.wheelAdapter.adapter = adapter;
-        adapter.wheelViewAdapter = wheelAdapter;
-        this.wheelAdapter.notifyDataSetChanged();
+        if (mAdapter != null) {
+            mAdapter.setWheelViewObserver(null);
+        }
+        mAdapter = adapter;
+        if (mAdapter != null) {
+            if (observer == null) {
+                observer = new WheelViewObserver();
+            }
+            mAdapter.setWheelViewObserver(observer);
+            this.selectedPosition = -1;
+            this.lastSelectedPosition = -1;
+            this.wheelAdapter.adapter = adapter;
+            this.wheelAdapter.notifyDataSetChanged();
+        }
     }
 
     public WheelAdapter getAdapter() {
-        return adapter;
+        return mAdapter;
+    }
+
+    private void dataSetChanged() {
+        this.wheelAdapter.notifyDataSetChanged();
     }
 
     public void setCurrentItem(int position) {
@@ -242,10 +177,17 @@ public class WheelView extends ViewGroup {
     }
 
     public int getCurrentItem() {
+        int adapterCount = layoutManager.getItemCount();
+        if (wheelDecoration.centerItemPosition >= adapterCount) return 0; //如果当前位置大于整个适配器大小,刷新时RecyclerView会回到第0个位置
+        int wheelCount = adapterCount - itemCount * 2;
+        if (wheelDecoration.centerItemPosition >= wheelCount) {
+            return wheelCount -1;
+        }
         return wheelDecoration.centerItemPosition;
     }
 
     private OnItemSelectedListener listener;
+    private OnItemClickListener clickListener;
 
     public void setOnItemSelectedListener(OnItemSelectedListener listener) {
         this.listener = listener;
@@ -255,24 +197,70 @@ public class WheelView extends ViewGroup {
      * item selected
      */
     public interface OnItemSelectedListener {
-        void onItemSelected(int index);
+        void onItemSelected(WheelView wheelView, int index);
+    }
+
+    /**
+     * 设置点击
+     * @param listener
+     */
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        if (itemClickListener == null) {
+            itemClickListener = new WheelItemClickListener(getContext()) {
+                @Override
+                void onItemClick(int position) {
+                    int currentPosition = position - itemCount;
+                    if (clickListener != null && currentPosition == getCurrentItem()) {
+                        clickListener.onItemClick(WheelView.this, currentPosition);
+                    }
+                }
+            };
+            mRecyclerView.addOnItemTouchListener(itemClickListener);
+        }
+        this.clickListener = listener;
+    }
+
+    /**
+     * item点击
+     */
+    public interface OnItemClickListener {
+        void onItemClick(WheelView wheelView, int centerPosition);
+    }
+
+    private class WheelViewObserver extends DataSetObserver {
+        @Override
+        public void onChanged() {
+            dataSetChanged();
+        }
+
+        @Override
+        public void onInvalidated() {
+            dataSetChanged();
+        }
     }
 
     /**
      * wheel adapter
-     * by you
      */
     public static abstract class WheelAdapter {
 
-        WheelViewAdapter wheelViewAdapter;
+        private DataSetObserver wheelObserver;
+
+        void setWheelViewObserver(DataSetObserver observer) {
+            synchronized (this) {
+                wheelObserver = observer;
+            }
+        }
 
         protected abstract int getItemCount();
 
         protected abstract String getItem(int index);
 
         public final void notifyDataSetChanged() {
-            if (wheelViewAdapter != null) {
-                wheelViewAdapter.notifyDataSetChanged();
+            synchronized (this) {
+                if (wheelObserver != null) {
+                    wheelObserver.onChanged();
+                }
             }
         }
     }

@@ -30,8 +30,8 @@ class SimpleWheelDecoration extends WheelDecoration {
 
     private final WheelViewAdapter adapter;
 
-    SimpleWheelDecoration(WheelViewAdapter adapter, int gravity, float gravityCoefficient, int textColor, int textColorCenter, float textSize, int dividerColor, int dividerSize) {
-        super(adapter.itemCount, adapter.itemSize, gravity, gravityCoefficient);
+    SimpleWheelDecoration(WheelViewAdapter adapter, int gravity, int textColor, int textColorCenter, float textSize, int dividerColor, int dividerSize) {
+        super(adapter.itemCount, adapter.itemSize, gravity);
         this.textColor = textColor;
         this.textColorCenter = textColorCenter;
         this.dividerSize = dividerSize;

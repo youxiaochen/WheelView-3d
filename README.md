@@ -1,5 +1,5 @@
 # WheelView-3d
-### Camera, Matrix 实现WheelView 3d效果, 后面只维护WheelView3D for androidx的版本,详见WheelView3D的项目
+### Camera, Matrix 实现WheelView 3d效果, 后面只维护WheelView3D for androidx的版本,详见WheelView3D的项目 https://github.com/youxiaochen/WheelView3D
 
 ### 如果要实现比较复杂的任何布局方式整个childView旋转效果可以参考博客  http://www.jianshu.com/p/41e4602deca6
 

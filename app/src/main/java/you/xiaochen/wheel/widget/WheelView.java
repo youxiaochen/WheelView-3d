@@ -135,11 +135,11 @@ public class WheelView extends FrameLayout {
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (listener == null || wheelDecoration == null) return;
+                //if (listener == null || wheelDecoration == null) return;
                 if (wheelDecoration.centerItemPosition == IDLE_POSITION || newState != RecyclerView.SCROLL_STATE_IDLE) return;
                 selectedPosition = wheelDecoration.centerItemPosition;
                 if (selectedPosition != lastSelectedPosition) {
-                    listener.onItemSelected(WheelView.this, selectedPosition);
+                    if (listener != null) listener.onItemSelected(WheelView.this, selectedPosition);
                     lastSelectedPosition = selectedPosition;
                 }
             }

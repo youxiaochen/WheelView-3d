@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <chen.you.wheel.WheelView
+        android:id="@+id/wv_city"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:wheelOrientation="vertical"
+        app:wheelItemCount="3"
+        app:wheelItemSize="30dp"
+        app:wheelGravity="center"
+        app:wheelTextSize="18sp"
+        app:wheelTextColor="#333333"
+        app:wheelTextCenterColor="#ff00ff"
+        app:wheelDividerSize="1dp"
+        app:wheelDividerColor="#00ff00"
+        app:wheelGradient="true"
+        app:wheelDividerPadding="2dp"/>
+
+    <Button android:id="@+id/bt0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="测试新数据"/>
+
+    <Button android:id="@+id/bt1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="测试setWheelParams()"/>
+
+    <Button android:id="@+id/bt2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="测试setDrawManager()"/>
+
+    <Button android:id="@+id/bt3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="测试新adapter"/>
+
+</LinearLayout>

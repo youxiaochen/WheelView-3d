@@ -61,40 +61,37 @@
 
         </LinearLayout>
 
-
-        <you.xiaochen.wheel.widget.WheelView
+        <chen.you.wheel.WheelView
             android:id="@+id/wv_city"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             app:wheelItemCount="4"
-            app:wheelItemSize="28dp"
-            app:wheelDividerSize="30dp"
+            app:wheelItemSize="25dp"
+            app:wheelDividerSize="1dp"
             app:wheelGravity="left"
-            app:gravityCoefficient="0.6"
             app:wheelTextSize="18sp"/>
 
-        <you.xiaochen.wheel.widget.WheelView
+        <chen.you.wheel.WheelView
             android:id="@+id/wv_county"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             app:wheelItemCount="4"
-            app:wheelItemSize="28dp"
-            app:wheelDividerSize="30dp"
+            app:wheelItemSize="25dp"
+            app:wheelDividerSize="1dp"
             app:wheelGravity="center"
             app:wheelTextSize="18sp"/>
 
-        <you.xiaochen.wheel.widget.WheelView
+        <chen.you.wheel.WheelView
             android:id="@+id/wv_name"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             app:wheelItemCount="4"
-            app:wheelItemSize="28dp"
-            app:wheelDividerSize="30dp"
+            app:wheelItemSize="25dp"
+            app:wheelDividerSize="1dp"
             app:wheelGravity="right"
-            app:gravityCoefficient="0.6"
             app:wheelTextSize="18sp"/>
 
     </LinearLayout>
@@ -107,15 +104,21 @@
         android:textSize="18sp"
         android:text="水平布局88"/>
 
-    <you.xiaochen.wheel.widget.WheelView
+    <chen.you.wheel.WheelView
         android:id="@+id/wv_number"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_gravity="center_horizontal"
-        app:wheelItemCount="6"
-        app:wheelItemSize="45dp"
-        app:wheelDividerSize="48dp"
+        app:wheelItemCount="3"
+        app:wheelItemSize="30dp"
+        app:wheelDividerSize="1dp"
         app:wheelOrientation="horizontal"
         app:wheelTextSize="25sp"/>
+
+    <Button android:id="@+id/bt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAllCaps="false"
+        android:text="测试界面2"/>
 
 </LinearLayout>

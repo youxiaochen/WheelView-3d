@@ -1,6 +1,20 @@
 # WheelView-3d
 ### Camera, Matrix 实现WheelView 3d效果
 
+##使用
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+    
+    dependencies {
+	        implementation 'com.github.youxiaochen:WheelView-3d:1.2.0'
+	}
+}
+```
+
 ### 如果要实现比较复杂的任何布局方式整个childView旋转效果可以参考博客  http://www.jianshu.com/p/41e4602deca6
 
 ### 博客地址 http://www.jianshu.com/p/77656dbb07b2

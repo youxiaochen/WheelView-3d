@@ -61,7 +61,7 @@ dependencies {
 
 ```
 
-### 布局生成WheelView使用方式
+### 布局生成WheelView使用方式, 不设置时使用将使用默认值
 
 ```
 <chen.you.wheel.WheelView

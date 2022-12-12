@@ -7,11 +7,11 @@ allprojects {
     repositories {
         ...
         maven { url 'https://jitpack.io' }
-    }
-    
-    dependencies {
-	        implementation 'com.github.youxiaochen:WheelView-3d:1.2.0'
-	}
+    }  
+}
+
+dependencies {
+	implementation 'com.github.youxiaochen:WheelView-3d:1.2.0'
 }
 ```
 

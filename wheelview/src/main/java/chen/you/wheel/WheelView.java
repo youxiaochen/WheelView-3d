@@ -311,7 +311,7 @@ public final class WheelView extends ViewGroup {
             }
         }
 
-        protected abstract int getItemCount();
+        public abstract int getItemCount();
 
         /**
          * 绘制内容区域
@@ -354,7 +354,7 @@ public final class WheelView extends ViewGroup {
     public static abstract class WheelAdapter extends Adapter {
 
         // item toString
-        protected abstract String getItemString(int position);
+        public abstract String getItemString(int position);
 
         @Override
         protected void drawItem(Canvas c, Paint p, float cf, Rect itemRect, int position, WheelParams params) {

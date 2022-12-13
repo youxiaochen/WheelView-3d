@@ -68,12 +68,12 @@ public final class TwoActivity extends AppCompatActivity implements View.OnClick
             case R.id.bt3:
                 wv.setAdapter(new WheelView.WheelAdapter() {
                     @Override
-                    protected String getItemString(int position) {
+                    public String getItemString(int position) {
                         return "position " + position;
                     }
 
                     @Override
-                    protected int getItemCount() {
+                    public int getItemCount() {
                         return 100;
                     }
                 });
@@ -90,12 +90,12 @@ public final class TwoActivity extends AppCompatActivity implements View.OnClick
         }
 
         @Override
-        protected int getItemCount() {
+        public int getItemCount() {
             return strs.size();
         }
 
         @Override
-        protected String getItemString(int position) {
+        public String getItemString(int position) {
             return strs.get(position);
         }
     }

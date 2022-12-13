@@ -71,12 +71,12 @@ public class MainActivity extends AppCompatActivity {
         /*  名字适配  */
         wv_name.setAdapter(new WheelView.WheelAdapter() {
             @Override
-            protected int getItemCount() {
+            public int getItemCount() {
                 return 20;
             }
 
             @Override
-            protected String getItemString(int position) {
+            public String getItemString(int position) {
                 return "游小陈";
             }
         });
@@ -84,12 +84,12 @@ public class MainActivity extends AppCompatActivity {
         /* 水平滑轮控件 */
         wv_number.setAdapter(new WheelView.WheelAdapter() {
             @Override
-            protected int getItemCount() {
+            public int getItemCount() {
                 return 100;
             }
 
             @Override
-            protected String getItemString(int position) {
+            public String getItemString(int position) {
                 return String.valueOf(position);
             }
         });
@@ -113,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
 
     private class CityAdapter extends WheelView.WheelAdapter {
         @Override
-        protected int getItemCount() {
+        public int getItemCount() {
             return TestDatas.NAMES.length;
         }
 
         @Override
-        protected String getItemString(int position) {
+        public String getItemString(int position) {
             return TestDatas.NAMES[position];
         }
     }
@@ -132,12 +132,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected int getItemCount() {
+        public int getItemCount() {
             return strs.size();
         }
 
         @Override
-        protected String getItemString(int position) {
+        public String getItemString(int position) {
             return strs.get(position);
         }
     }

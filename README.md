@@ -92,7 +92,7 @@ WheelParams params = new WheelParams.Builder()
         ...
 //代码设置各种属性
 //亦可用此方式设置各属性  wv.getWheelParams().newBuilder().setOrientation(...) 
-wv.setLayoutParams(params);
+wv.setWheelParams(params);
 //设置绘制管理, 默认为WheelDrawManager产生3D旋转, 亦可设置SimpleDrawManager不旋转
 wv.setDrawManager(new WheelDrawManager());
 

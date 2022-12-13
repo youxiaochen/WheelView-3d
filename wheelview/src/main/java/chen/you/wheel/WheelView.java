@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -49,6 +50,10 @@ public final class WheelView extends ViewGroup {
     private List<OnItemSelectedListener> mSelectedListeners;
     //WheelView是否已经附着到窗体中
     private boolean hasAttachedToWindow = false;
+
+    //当前ViewGroup测量的矩阵与子控件要显示的矩阵
+    private Rect mContainerRect = new Rect();
+    private Rect mChildRect = new Rect();
 
     public WheelView(Context context) {
         super(context);
@@ -136,9 +141,9 @@ public final class WheelView extends ViewGroup {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int width = mRecyclerView.getMeasuredWidth();
         int height = mRecyclerView.getMeasuredHeight();
-        int left = getPaddingLeft();
-        int top = getPaddingTop();
-        mRecyclerView.layout(left, top, left + width, top + height);
+        mContainerRect.set(getPaddingLeft(), getPaddingTop(), r - l - getPaddingRight(), b - t - getPaddingBottom());
+        Gravity.apply(Gravity.TOP | Gravity.START, width, height, mContainerRect, mChildRect);
+        mRecyclerView.layout(mChildRect.left, mChildRect.top, mChildRect.right, mChildRect.bottom);
     }
 
     @Override

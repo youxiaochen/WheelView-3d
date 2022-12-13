@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 真正的3D WheelView
+ * 真正的3D WheelView, 内部核心类 DrawManager, WheelParams
  * Created by you on 2017/3/20.
  * 作QQ:86207610
  */

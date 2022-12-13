@@ -156,10 +156,10 @@ public final class WheelView extends ViewGroup {
 
     @Override
     protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         mRecyclerView.removeOnScrollListener(mScrollListener);
         mRecyclerView.removeItemDecoration(mDrawManager);
         hasAttachedToWindow = false;
-        super.onDetachedFromWindow();
     }
 
     /**

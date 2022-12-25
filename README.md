@@ -11,7 +11,7 @@ allprojects {
 }
 
 dependencies {
-	implementation 'com.github.youxiaochen:WheelView-3d:1.2.1'
+	implementation 'com.github.youxiaochen:WheelView-3d:1.2.2'
 }
 ```
 

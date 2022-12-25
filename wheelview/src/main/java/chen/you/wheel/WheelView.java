@@ -52,8 +52,8 @@ public final class WheelView extends ViewGroup {
     private boolean hasAttachedToWindow = false;
 
     //当前ViewGroup测量的矩阵与子控件要显示的矩阵
-    private Rect mContainerRect = new Rect();
-    private Rect mChildRect = new Rect();
+    private final Rect mContainerRect = new Rect();
+    private final Rect mChildRect = new Rect();
 
     public WheelView(Context context) {
         super(context);
@@ -74,7 +74,6 @@ public final class WheelView extends ViewGroup {
         mWheelParams = new WheelParams.Builder(context, attrs).build();
         mRecyclerView = new RecyclerView(context);
         mRecyclerView.setId(ViewCompat.generateViewId());
-        mRecyclerView.setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
         mRecyclerView.setHasFixedSize(true);
 
         mLayoutManager = new LinearLayoutManager(context, mWheelParams.getLayoutOrientation(), false);
@@ -191,7 +190,6 @@ public final class WheelView extends ViewGroup {
 
     /**
      * 设置适配器, 有实现的通用的 {@link WheelAdapter } , {@link Adapter}
-     * @param adapter
      */
     public void setAdapter(Adapter adapter) {
         if (mAdapter != null) {
@@ -362,7 +360,6 @@ public final class WheelView extends ViewGroup {
             if (text == null) text = "";
             c.drawText(text, itemRect.exactCenterX(), itemRect.exactCenterY() - cf, p);
         }
-
     }
 
     /**
@@ -416,24 +413,19 @@ public final class WheelView extends ViewGroup {
         @Override
         public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
             if (wheelParams == null) return;
-            if (!(parent.getLayoutManager() instanceof LinearLayoutManager)) return;
-            if (!(parent.getAdapter() instanceof WheelItemPainter)) return;
-            LinearLayoutManager llm = (LinearLayoutManager) parent.getLayoutManager();
+            if (parent.getLayoutManager() == null || !(parent.getAdapter() instanceof WheelItemPainter)) return;
             WheelItemPainter painter = (WheelItemPainter) parent.getAdapter();
+            int lastPosition = parent.getLayoutManager().getItemCount() - wheelParams.getShowItemCount();
             wvRect.set(parent.getPaddingLeft(), parent.getPaddingTop(),
                     parent.getWidth() - parent.getPaddingRight(),
                     parent.getHeight() - parent.getPaddingBottom());
-            int startPosition = llm.findFirstVisibleItemPosition();
-            if (startPosition < 0) return;
-            int endPosition = llm.findLastVisibleItemPosition();
             centerItemPosition = IDLE_POSITION;
-            for (int itemPosition = startPosition; itemPosition <= endPosition; itemPosition++) {
-                View itemView = llm.findViewByPosition(itemPosition);
-                if (itemView == null) continue;
+            for (int i = 0; i < parent.getChildCount(); i++) {
+                View itemView = parent.getChildAt(i);
                 int adapterPosition = parent.getChildAdapterPosition(itemView);
-                if (adapterPosition < wheelParams.getShowItemCount()) continue;//itemCount为空白项,不考虑
-                if (adapterPosition >= llm.getItemCount() - wheelParams.getShowItemCount()) break;//超过列表的也是空白项
-
+                if (adapterPosition < wheelParams.getShowItemCount() || adapterPosition >= lastPosition) {
+                    continue; //itemCount为空白项,不考虑 || 超过列表的也是空白项
+                }
                 itemRect.set(itemView.getLeft(), itemView.getTop(), itemView.getRight(), itemView.getBottom());
                 drawItem(painter, c, adapterPosition);
             }
@@ -480,7 +472,6 @@ public final class WheelView extends ViewGroup {
 
         WheelViewAdapter(WheelParams wheelParams) {
             this.wheelParams = wheelParams;
-
             textPaint = new Paint();
             textPaint.setAntiAlias(true);
             textPaint.setTextSize(wheelParams.textSize);
@@ -508,7 +499,7 @@ public final class WheelView extends ViewGroup {
             } else {
                 view.setLayoutParams(new LayoutParams(wheelParams.itemSize, LayoutParams.MATCH_PARENT));
             }
-            view.setVisibility(View.INVISIBLE); //不显示只留测量性能更忧
+            view.setVisibility(View.INVISIBLE);
             return new RecyclerView.ViewHolder(view) {};
         }
 

@@ -172,6 +172,7 @@ public final class WheelView extends ViewGroup {
 
     @SuppressLint("NotifyDataSetChanged")
     private void onDataSetChanged() {
+        mWheelViewAdapter.refreshDataCounts();
         mWheelViewAdapter.notifyDataSetChanged();
     }
 
@@ -462,6 +463,8 @@ public final class WheelView extends ViewGroup {
         final WheelParams wheelParams;
         //wheel adapter
         Adapter adapter = null;
+        //ItemCount为null时重新计算,亦防止重复计算
+        Integer itemCounts;
 
         //text画笔
         private final Paint textPaint;
@@ -485,9 +488,16 @@ public final class WheelView extends ViewGroup {
             dividerPaint.setColor(wheelParams.dividerColor);
         }
 
+        void refreshDataCounts() {
+            itemCounts = null;
+        }
+
         @Override
         public int getItemCount() {
-            return wheelParams.getShowItemCount() * 2 + (adapter == null ? 0 : adapter.getItemCount());
+            if (itemCounts == null) {
+                itemCounts = wheelParams.getShowItemCount() * 2 + (adapter == null ? 0 : adapter.getItemCount());
+            }
+            return itemCounts;
         }
 
         @NonNull

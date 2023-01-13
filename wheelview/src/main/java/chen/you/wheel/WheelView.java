@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSnapHelper;
@@ -55,23 +56,38 @@ public final class WheelView extends ViewGroup {
     private final Rect mContainerRect = new Rect();
     private final Rect mChildRect = new Rect();
 
-    public WheelView(Context context) {
+    public WheelView(@NonNull Context context) {
         super(context);
         initialize(context, null);
     }
 
-    public WheelView(Context context, AttributeSet attrs) {
+    //用代码生成控件
+    public WheelView(@NonNull Context context, @NonNull WheelParams params, @NonNull WheelDrawManager drawManager) {
+        super(context);
+        initialize(context, params, drawManager);
+    }
+
+    public WheelView(@NonNull Context context, @NonNull WheelParams params) {
+        this(context, params, new WheelDrawManager());
+    }
+
+    public WheelView(@NonNull Context context, AttributeSet attrs) {
         super(context, attrs);
         initialize(context, attrs);
     }
 
-    public WheelView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WheelView(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialize(context, attrs);
     }
 
-    private void initialize(Context context, AttributeSet attrs) {
-        mWheelParams = new WheelParams.Builder(context, attrs).build();
+    private void initialize(@NonNull Context context, AttributeSet attrs) {
+        WheelParams params = new WheelParams.Builder(context, attrs).build();
+        initialize(context, params, new WheelDrawManager());
+    }
+
+    private void initialize(Context context, WheelParams params, WheelDrawManager drawManager) {
+        this.mWheelParams = params;
         mRecyclerView = new RecyclerView(context);
         mRecyclerView.setId(ViewCompat.generateViewId());
         mRecyclerView.setHasFixedSize(true);
@@ -83,7 +99,7 @@ public final class WheelView extends ViewGroup {
 
         mWheelViewAdapter = new WheelViewAdapter(mWheelParams);
         mRecyclerView.setAdapter(mWheelViewAdapter);
-        mDrawManager = new WheelDrawManager();
+        this.mDrawManager = drawManager;
         mDrawManager.setWheelParams(mWheelParams);
 
         mScrollListener = new OnScrollListener();
@@ -192,7 +208,7 @@ public final class WheelView extends ViewGroup {
     /**
      * 设置适配器, 有实现的通用的 {@link WheelAdapter } , {@link Adapter}
      */
-    public void setAdapter(Adapter adapter) {
+    public void setAdapter(@Nullable Adapter adapter) {
         if (mAdapter != null) {
             mAdapter.setWheelViewObserver(null);
         }
@@ -213,8 +229,8 @@ public final class WheelView extends ViewGroup {
      * 设置params, 用于代码生成WheelView时
      * @param wheelParams 新的参数 详见{@link WheelParams.Builder}
      */
-    public void setWheelParams(WheelParams wheelParams) {
-        if (mWheelParams == wheelParams || mWheelParams == null) return;
+    public void setWheelParams(@NonNull WheelParams wheelParams) {
+        if (mWheelParams == wheelParams) return;
         mRecyclerView.removeItemDecoration(mDrawManager);
         mWheelParams = wheelParams;
         mDrawManager.setWheelParams(mWheelParams);
@@ -231,8 +247,7 @@ public final class WheelView extends ViewGroup {
     /**
      * 设置DrawManager
      */
-    public void setDrawManager(DrawManager drawManager) {
-        if (drawManager == null) return;
+    public void setDrawManager(@NonNull DrawManager drawManager) {
         mRecyclerView.removeItemDecoration(mDrawManager);
         mDrawManager = drawManager;
         mDrawManager.setWheelParams(mWheelParams);
@@ -264,15 +279,15 @@ public final class WheelView extends ViewGroup {
         return mDrawManager.centerItemPosition;
     }
 
-    public WheelParams getWheelParams() {
+    @NonNull public WheelParams getWheelParams() {
         return mWheelParams;
     }
 
-    public DrawManager getDrawManager() {
+    @NonNull public DrawManager getDrawManager() {
         return mDrawManager;
     }
 
-    public Adapter getAdapter() {
+    @Nullable public Adapter getAdapter() {
         return mAdapter;
     }
 

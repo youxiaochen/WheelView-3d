@@ -19,11 +19,13 @@ dependencies {
 
 ### 博客地址 http://www.jianshu.com/p/77656dbb07b2
 
-![纵向排列](https://github.com/youxiaochen/WheelView-3d/blob/master/imgs/GIF111.gif)
+![纵向排列](imgs/GIF111.gif)
 
 <br/>
 
-![水平排列](https://github.com/youxiaochen/WheelView-3d/blob/master/imgs/GIF222.gif)
+![水平排列](imgs/GIF222.gif)
+<br/>
+![水平排列](imgs/原理图.png)
 
 
 ```
@@ -114,8 +116,10 @@ adapter.notifyDataSetChanged() ...
 
 ```
 
-### 博客地址 http://www.jianshu.com/p/77656dbb07b2
+### E-mail-QQ: 86207610@qq.com  W: 86207610   Welcome to star
 
-### 如果要实现比较复杂的任何布局方式整个childView旋转效果可以参考博客  http://www.jianshu.com/p/41e4602deca6
+#### 博客地址 http://www.jianshu.com/p/77656dbb07b2
+
+#### 如果要实现比较复杂的任何布局方式整个childView旋转效果可以参考博客  http://www.jianshu.com/p/41e4602deca6
 
 

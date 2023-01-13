@@ -182,7 +182,7 @@ public final class WheelParams {
                 TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.WheelView);
                 orientation = a.getInt(R.styleable.WheelView_wheelOrientation, orientation);
                 itemCount = a.getInt(R.styleable.WheelView_wheelItemCount, itemCount);
-                itemSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelItemSize, itemSize);
+                itemSize = a.getDimensionPixelSize(R.styleable.WheelView_wheelItemSize, itemSize);
                 gravity = a.getInt(R.styleable.WheelView_wheelGravity, gravity);
                 textSize = a.getDimension(R.styleable.WheelView_wheelTextSize, textSize);
                 textColor = a.getColor(R.styleable.WheelView_wheelTextColor, textColor);
@@ -190,7 +190,7 @@ public final class WheelParams {
                 gradient = a.getBoolean(R.styleable.WheelView_wheelGradient, gradient);
                 dividerColor = a.getColor(R.styleable.WheelView_wheelDividerColor, dividerColor);
                 dividerSize = a.getDimensionPixelOffset(R.styleable.WheelView_wheelDividerSize, dividerSize);
-                dividerPadding = a.getDimensionPixelOffset(R.styleable.WheelView_wheelDividerPadding, dividerPadding);
+                dividerPadding = a.getDimensionPixelSize(R.styleable.WheelView_wheelDividerPadding, dividerPadding);
                 a.recycle();
             }
         }

@@ -3,18 +3,20 @@ package chen.you.wheel;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+
+import androidx.annotation.NonNull;
 
 /**
- * 3D旋转绘制管理类
+ * 3D滚轮旋转Canvas处理类
  * Created by you on 2017/3/20.
  * 作QQ:86207610
  */
 public class WheelDrawManager extends WheelView.DrawManager {
     /**
-     * 保留2个相素让RecyclerView的顶部和底部可以多预画一个item, {@link WheelItemShowOrder}
+     * 保留2个相素让RecyclerView的顶部和底部可以多预画一个item, {@link WheelDrawManager.WheelItemShowOrder}
      */
     private static final int SHOW_ORDER_OFFSET = 2;
-
     //此参数影响左右旋转对齐时的效果,系数越大,越明显(0-1之间)
     private static final float DEF_SCALE = 0.75F;
     //3D旋转
@@ -24,6 +26,10 @@ public class WheelDrawManager extends WheelView.DrawManager {
     float itemDegree;
     //滑动轴的半径,旋转的偏移需要通过此参数和itemDegree来计算
     float wheelRadio;
+    //中心偏移值即为itemSize / 2
+    float centerItemScrollOff;
+
+    final WheelItemShowOrder itemShowOrder = new WheelItemShowOrder();
 
     public WheelDrawManager() {
         camera = new Camera();
@@ -31,28 +37,33 @@ public class WheelDrawManager extends WheelView.DrawManager {
     }
 
     @Override
-    void setWheelParams(WheelParams params) {
+    protected void setWheelParams(@NonNull WheelParams params) {
         super.setWheelParams(params);
         this.itemDegree = 180.f / (params.itemCount * 2 + 1);
         this.wheelRadio = (float) ((params.itemSize / 2.f) / Math.tan(Math.toRadians(itemDegree / 2.f)));
+        centerItemScrollOff = params.itemSize / 2.f;
     }
 
     @Override
-    void drawItem(WheelView.WheelItemPainter painter, Canvas c, int adapterPosition) {
+    protected void decorationItem(@NonNull Canvas c, @NonNull Rect itemRect, int position, @NonNull String item) {
         if (wheelParams.isVertical()) {
-            drawVerticalItem(painter, c, adapterPosition);
+            decorationVerticalItem(c, position, item);
         } else {
-            drawHorizontalItem(painter, c, adapterPosition);
+            decorationHorizontalItem(c, position, item);
         }
     }
 
-    private void drawVerticalItem(WheelView.WheelItemPainter painter, Canvas c, int adapterPosition) {
-        int position = adapterPosition - wheelParams.getShowItemCount();//数据中的实际位置
+    @Override
+    protected WheelParams.ItemShowOrder getShowOrder() {
+        return itemShowOrder;
+    }
+
+    private void decorationVerticalItem(Canvas c, int position, String item) {
         float itemCenterY = itemRect.exactCenterY();
         float scrollOffY = itemCenterY - wvRect.exactCenterY();
         if (Math.abs(scrollOffY) <= SHOW_ORDER_OFFSET) { //正中心
             centerItemPosition = position;
-            painter.drawCenterItem(c, itemRect, 255, position);
+            getItemPainter().drawCenterItem(c, itemRect, 255, item);
             return;
         }
         float rotateDegreeX = scrollOffY * itemDegree / wheelParams.itemSize;//垂直布局时要以X轴为中心旋转
@@ -99,20 +110,19 @@ public class WheelDrawManager extends WheelView.DrawManager {
         matrix.postTranslate(translateX, itemCenterY);
         c.concat(matrix);
         if (isCenterItem) {
-            painter.drawCenterItem(c, itemRect, alpha, position);
+            getItemPainter().drawCenterItem(c, itemRect, alpha, item);
         } else {
-            painter.drawItem(c, itemRect, alpha, position);
+            getItemPainter().drawItem(c, itemRect, alpha, item);
         }
         c.restore();
     }
 
-    private void drawHorizontalItem(WheelView.WheelItemPainter painter, Canvas c, int adapterPosition) {
-        int position = adapterPosition - wheelParams.getShowItemCount();
+    private void decorationHorizontalItem(Canvas c, int position, String item) {
         float itemCenterX = itemRect.exactCenterX();
         float scrollOffX = itemCenterX - wvRect.exactCenterX();
         if (Math.abs(scrollOffX) <= SHOW_ORDER_OFFSET) { //正中心
             centerItemPosition = position;
-            painter.drawCenterItem(c, itemRect, 255, position);
+            getItemPainter().drawCenterItem(c, itemRect, 255, item);
             return;
         }
         float rotateDegreeY = scrollOffX * itemDegree / wheelParams.itemSize;//垂直布局时要以Y轴为中心旋转
@@ -150,9 +160,9 @@ public class WheelDrawManager extends WheelView.DrawManager {
         matrix.postTranslate(itemCenterX, parentCenterY);
         c.concat(matrix);
         if (isCenterItem) {
-            painter.drawCenterItem(c, itemRect, alpha, position);
+            getItemPainter().drawCenterItem(c, itemRect, alpha, item);
         } else {
-            painter.drawItem(c, itemRect, alpha, position);
+            getItemPainter().drawItem(c, itemRect, alpha, item);
         }
         c.restore();
     }
@@ -167,11 +177,6 @@ public class WheelDrawManager extends WheelView.DrawManager {
         if (degree >= 90) return 0;
         float al = (90 - degree) / 90;
         return (int) (255 * al);
-    }
-
-    @Override
-    WheelParams.ItemShowOrder getShowOrder() {
-        return new WheelItemShowOrder();
     }
 
     static class WheelItemShowOrder implements WheelParams.ItemShowOrder {

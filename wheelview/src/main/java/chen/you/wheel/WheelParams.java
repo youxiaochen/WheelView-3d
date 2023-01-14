@@ -129,7 +129,7 @@ public final class WheelParams {
     /**
      * 界面显示规则, 3D旋转后由于圆形直径相比非旋转时的大小相差很大, 因此需要对显示数量和大小进行修改
      */
-    interface ItemShowOrder {
+    public interface ItemShowOrder {
 
         int getShowItemCount(int itemCount);
 

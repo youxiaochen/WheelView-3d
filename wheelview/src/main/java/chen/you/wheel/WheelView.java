@@ -6,11 +6,13 @@ import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
@@ -35,10 +37,11 @@ public final class WheelView extends ViewGroup {
     private WheelParams mWheelParams;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    //item绘制器
+
+    //绘制器管理
     private DrawManager mDrawManager;
-    //RecyclerView adapter并item绘制画笔
-    private WheelViewAdapter mWheelViewAdapter;
+    //RecyclerView adapter
+    private WheelAdapter mWheelAdapter;
     //WheelView Adapter
     private Adapter mAdapter;
     private WheelViewObserver mObserver;
@@ -61,14 +64,15 @@ public final class WheelView extends ViewGroup {
         initialize(context, null);
     }
 
-    //用代码生成控件
-    public WheelView(@NonNull Context context, @NonNull WheelParams params, @NonNull WheelDrawManager drawManager) {
-        super(context);
-        initialize(context, params, drawManager);
+    public WheelView(@NonNull Context context, @NonNull WheelParams params) {
+        this(context, params, new WheelDrawManager(), new SimpleItemPainter());
     }
 
-    public WheelView(@NonNull Context context, @NonNull WheelParams params) {
-        this(context, params, new WheelDrawManager());
+    //用代码生成控件
+    public WheelView(@NonNull Context context, @NonNull WheelParams params,
+                     @NonNull DrawManager drawManager, @NonNull ItemPainter painter) {
+        super(context);
+        initialize(context, params, drawManager, painter);
     }
 
     public WheelView(@NonNull Context context, AttributeSet attrs) {
@@ -83,10 +87,10 @@ public final class WheelView extends ViewGroup {
 
     private void initialize(@NonNull Context context, AttributeSet attrs) {
         WheelParams params = new WheelParams.Builder(context, attrs).build();
-        initialize(context, params, new WheelDrawManager());
+        initialize(context, params, new WheelDrawManager(), new SimpleItemPainter());
     }
 
-    private void initialize(Context context, WheelParams params, WheelDrawManager drawManager) {
+    private void initialize(Context context, WheelParams params, DrawManager drawManager, ItemPainter painter) {
         this.mWheelParams = params;
         mRecyclerView = new RecyclerView(context);
         mRecyclerView.setId(ViewCompat.generateViewId());
@@ -97,10 +101,11 @@ public final class WheelView extends ViewGroup {
         //让滑动结束时都能定到中心位置
         new LinearSnapHelper().attachToRecyclerView(mRecyclerView);
 
-        mWheelViewAdapter = new WheelViewAdapter(mWheelParams);
-        mRecyclerView.setAdapter(mWheelViewAdapter);
+        mWheelAdapter = new WheelAdapter(mWheelParams);
+        mRecyclerView.setAdapter(mWheelAdapter);
         this.mDrawManager = drawManager;
         mDrawManager.setWheelParams(mWheelParams);
+        mDrawManager.setItemPainter(painter);
 
         mScrollListener = new OnScrollListener();
         super.addView(mRecyclerView, -1, createLayoutParams());
@@ -178,7 +183,7 @@ public final class WheelView extends ViewGroup {
     }
 
     /**
-     *  创建WheelView的LayoutParams
+     * 创建WheelView的LayoutParams
      */
     private LayoutParams createLayoutParams() {
         if (mWheelParams.isVertical())
@@ -188,8 +193,8 @@ public final class WheelView extends ViewGroup {
 
     @SuppressLint("NotifyDataSetChanged")
     private void onDataSetChanged() {
-        mWheelViewAdapter.refreshDataCounts();
-        mWheelViewAdapter.notifyDataSetChanged();
+        mWheelAdapter.refreshDataCounts();
+        mWheelAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -219,7 +224,7 @@ public final class WheelView extends ViewGroup {
             }
             mAdapter.setWheelViewObserver(mObserver);
             this.mSelectedPosition = IDLE_POSITION;
-            this.mWheelViewAdapter.adapter = adapter;
+            this.mWheelAdapter.adapter = adapter;
             onDataSetChanged();
             mLayoutManager.scrollToPositionWithOffset(0, 0);
         }
@@ -227,17 +232,17 @@ public final class WheelView extends ViewGroup {
 
     /**
      * 设置params, 用于代码生成WheelView时
+     *
      * @param wheelParams 新的参数 详见{@link WheelParams.Builder}
      */
     public void setWheelParams(@NonNull WheelParams wheelParams) {
-        if (mWheelParams == wheelParams) return;
         mRecyclerView.removeItemDecoration(mDrawManager);
         mWheelParams = wheelParams;
         mDrawManager.setWheelParams(mWheelParams);
-        mWheelViewAdapter = new WheelViewAdapter(mWheelParams);
-        mWheelViewAdapter.adapter = mAdapter;
+        mWheelAdapter = new WheelAdapter(mWheelParams);
+        mWheelAdapter.adapter = mAdapter;
         mLayoutManager.setOrientation(mWheelParams.getLayoutOrientation());
-        mRecyclerView.setAdapter(mWheelViewAdapter);
+        mRecyclerView.setAdapter(mWheelAdapter);
         if (hasAttachedToWindow) {
             mRecyclerView.addItemDecoration(mDrawManager);
         }
@@ -247,7 +252,9 @@ public final class WheelView extends ViewGroup {
     /**
      * 设置DrawManager
      */
+    @SuppressLint("NotifyDataSetChanged")
     public void setDrawManager(@NonNull DrawManager drawManager) {
+        drawManager.setItemPainter(mDrawManager.itemPainter);
         mRecyclerView.removeItemDecoration(mDrawManager);
         mDrawManager = drawManager;
         mDrawManager.setWheelParams(mWheelParams);
@@ -255,6 +262,13 @@ public final class WheelView extends ViewGroup {
             mRecyclerView.addItemDecoration(mDrawManager);
         }
         mRecyclerView.setLayoutParams(createLayoutParams());
+        mWheelAdapter.notifyDataSetChanged();
+    }
+
+    //设置item绘制器
+    public void setItemPainter(@NonNull ItemPainter painter) {
+        mDrawManager.setItemPainter(painter);
+        invalidate();
     }
 
     /**
@@ -279,15 +293,23 @@ public final class WheelView extends ViewGroup {
         return mDrawManager.centerItemPosition;
     }
 
-    @NonNull public WheelParams getWheelParams() {
+    @NonNull
+    public WheelParams getWheelParams() {
         return mWheelParams;
     }
 
-    @NonNull public DrawManager getDrawManager() {
+    @NonNull
+    public DrawManager getDrawManager() {
         return mDrawManager;
     }
 
-    @Nullable public Adapter getAdapter() {
+    @NonNull
+    public ItemPainter getItemPainter() {
+        return mDrawManager.itemPainter;
+    }
+
+    @Nullable
+    public Adapter getAdapter() {
         return mAdapter;
     }
 
@@ -327,55 +349,7 @@ public final class WheelView extends ViewGroup {
 
         public abstract int getItemCount();
 
-        /**
-         * 绘制内容区域
-         * @param c Canvas
-         * @param p TextPaint
-         * @param cf 居中时根据中心Y坐标 - textHeight
-         * @param itemRect 绘制内容区域
-         * @param position adapter index
-         * @param params WheelParams
-         */
-        protected abstract void drawItem(Canvas c, Paint p, float cf, Rect itemRect, int position, WheelParams params);
-
-        /**
-         * 绘制分割线
-         * @param c Canvas
-         * @param p Paint
-         * @param wvRect Wheel Rect
-         * @param params WheelParams
-         */
-        protected void drawDivider(Canvas c, Paint p, Rect wvRect, WheelParams params) {
-            if (params.isVertical()) {
-                float dividerOff = (wvRect.height() - params.itemSize) / 2.0f;
-                float firstY = wvRect.top + dividerOff - params.dividerPadding;
-                c.drawLine(wvRect.left, firstY, wvRect.right, firstY, p);
-                float secondY = wvRect.bottom - dividerOff + params.dividerPadding;
-                c.drawLine(wvRect.left, secondY, wvRect.right, secondY, p);
-            } else {
-                float dividerOff = (wvRect.width() - params.itemSize) / 2.0f;
-                float firstX = wvRect.left + dividerOff - params.dividerPadding;
-                c.drawLine(firstX, wvRect.top, firstX, wvRect.bottom, p);
-                float secondX = wvRect.right - dividerOff + params.dividerPadding;
-                c.drawLine(secondX, wvRect.top, secondX, wvRect.bottom, p);
-            }
-        }
-    }
-
-    /**
-     * 直接画文本适配器
-     */
-    public static abstract class WheelAdapter extends Adapter {
-
-        // item toString
-        public abstract String getItemString(int position);
-
-        @Override
-        protected void drawItem(Canvas c, Paint p, float cf, Rect itemRect, int position, WheelParams params) {
-            String text = getItemString(position);
-            if (text == null) text = "";
-            c.drawText(text, itemRect.exactCenterX(), itemRect.exactCenterY() - cf, p);
-        }
+        @NonNull public abstract String getItem(int position);
     }
 
     /**
@@ -406,74 +380,133 @@ public final class WheelView extends ViewGroup {
     }
 
     /**
-     * Wheel Item绘制管理
+     * Item绘制器
+     */
+    public static class ItemPainter {
+        WheelParams wheelParams;
+
+        @CallSuper
+        protected void setWheelParams(@NonNull WheelParams params) {
+            this.wheelParams = params;
+        }
+
+        protected final WheelParams getWheelParams() {
+            return wheelParams;
+        }
+
+        //画item
+        protected void drawItem(@NonNull Canvas c, @NonNull Rect itemRect, int alpha, @NonNull String item) {
+        }
+
+        //画中心item
+        protected void drawCenterItem(@NonNull Canvas c, @NonNull Rect itemRect, int alpha, @NonNull String item) {
+        }
+
+        //画分割线
+        protected void drawDivider(@NonNull Canvas c, @NonNull Rect parentRect) {
+        }
+    }
+
+    /**
+     * 绘制器管理, 亦可重写此类实现想要的效果
+     * 不旋转处理的管理类{@link LinearDrawManager}, Wheel效果的{@link WheelDrawManager}
      */
     public static abstract class DrawManager extends RecyclerView.ItemDecoration {
         //Wheel相关参数
         WheelParams wheelParams;
-        //中心位置
-        int centerItemPosition = IDLE_POSITION;
+        //Item绘制器
+        ItemPainter itemPainter;
         //整个WheelView的显示区域
         final Rect wvRect = new Rect();
         //item显示区域
         final Rect itemRect = new Rect();
-        //中心偏移值即为itemSize / 2
-        float centerItemScrollOff;
+        //中心位置
+        int centerItemPosition = IDLE_POSITION;
 
-        void setWheelParams(WheelParams params) {
+        @CallSuper
+        protected void setWheelParams(@NonNull WheelParams params) {
             params.setItemShowOrder(getShowOrder());
             this.wheelParams = params;
-            centerItemScrollOff = params.itemSize / 2.f;
+            if (itemPainter != null) {
+                itemPainter.setWheelParams(wheelParams);
+            }
+        }
+
+        @CallSuper
+        void setItemPainter(@NonNull ItemPainter itemPainter) {
+            if (this.wheelParams != null) {
+                itemPainter.setWheelParams(wheelParams);
+            }
+            this.itemPainter = itemPainter;
+        }
+
+        public final WheelParams getWheelParams() {
+            return wheelParams;
+        }
+
+        public final ItemPainter getItemPainter() {
+            return itemPainter;
+        }
+
+        public final int getCenterItemPosition() {
+            return centerItemPosition;
+        }
+
+        protected void setCenterItemPosition(int centerItemPosition) {
+            this.centerItemPosition = centerItemPosition;
         }
 
         @Override
-        public void onDraw(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-            if (wheelParams == null) return;
-            if (parent.getLayoutManager() == null || !(parent.getAdapter() instanceof WheelItemPainter)) return;
-            WheelItemPainter painter = (WheelItemPainter) parent.getAdapter();
-            int lastPosition = parent.getLayoutManager().getItemCount() - wheelParams.getShowItemCount();
-            wvRect.set(parent.getPaddingLeft(), parent.getPaddingTop(),
-                    parent.getWidth() - parent.getPaddingRight(),
-                    parent.getHeight() - parent.getPaddingBottom());
-            centerItemPosition = IDLE_POSITION;
-            for (int i = 0; i < parent.getChildCount(); i++) {
-                View itemView = parent.getChildAt(i);
-                int adapterPosition = parent.getChildAdapterPosition(itemView);
-                if (adapterPosition < wheelParams.getShowItemCount() || adapterPosition >= lastPosition) {
+        public final void getItemOffsets(@NonNull Rect outRect, @NonNull View view,
+                                   @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        }
+
+        @Override
+        public final void onDrawOver(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+        }
+
+        @Override
+        public void onDraw(@NonNull Canvas c, @NonNull RecyclerView rv, @NonNull RecyclerView.State state) {
+            if (wheelParams == null || itemPainter == null) return;
+            if (rv.getLayoutManager() == null || !(rv.getAdapter() instanceof WheelAdapter)) return;
+            int wheelCount = rv.getLayoutManager().getItemCount() - wheelParams.getShowItemCount() * 2;
+            WheelAdapter adapter = (WheelAdapter) rv.getAdapter();
+            wvRect.set(rv.getPaddingLeft(), rv.getPaddingTop(),
+                    rv.getWidth() - rv.getPaddingRight(), rv.getHeight() - rv.getPaddingBottom());
+            preDecoration(c, wvRect);
+            for (int i = 0; i < rv.getChildCount(); i++) {
+                View itemView = rv.getChildAt(i);
+                int adapterPosition = rv.getChildAdapterPosition(itemView) - wheelParams.getShowItemCount();
+                if (adapterPosition < 0 || adapterPosition >= wheelCount) {
                     continue; //itemCount为空白项,不考虑 || 超过列表的也是空白项
                 }
                 itemRect.set(itemView.getLeft(), itemView.getTop(), itemView.getRight(), itemView.getBottom());
-                drawItem(painter, c, adapterPosition);
+                decorationItem(c, itemRect, adapterPosition, adapter.getItem(adapterPosition));
             }
-            painter.drawDivider(c, wvRect);
+            decorationOver(c, wvRect);
         }
 
-        //画item
-        abstract void drawItem(WheelItemPainter painter, Canvas c, int adapterPosition);
+        //不处理
+        protected WheelParams.ItemShowOrder getShowOrder() {
+            return null;
+        }
 
-        //item显示规则
-        abstract WheelParams.ItemShowOrder getShowOrder();
+        //Canvas预装饰
+        protected void preDecoration(@NonNull Canvas c, @NonNull Rect parentRect) {
+            centerItemPosition = IDLE_POSITION;
+        }
+
+        //画item时的画笔装饰
+        protected abstract void decorationItem(@NonNull Canvas c, @NonNull Rect itemRect, int position, @NonNull String item);
+
+        //画完item时的画笔装饰
+        protected void decorationOver(@NonNull Canvas c, @NonNull Rect parentRect) {
+            itemPainter.drawDivider(c, parentRect);
+        }
     }
 
-    /**
-     * Wheel Item绘制器
-     */
-    interface WheelItemPainter {
-
-        //画item
-        void drawItem(Canvas c, Rect itemRect, int alpha, int position);
-
-        //画中心item
-        void drawCenterItem(Canvas c, Rect itemRect, int alpha, int position);
-
-        //画分割线
-        void drawDivider(Canvas c, Rect wvRect);
-    }
-
-    /**
-     * WheelView适配器代理
-     */
-    static class WheelViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements WheelItemPainter {
+    //RecyclerView实际显示的adapter
+    static class WheelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         //wheel params
         final WheelParams wheelParams;
         //wheel adapter
@@ -481,26 +514,8 @@ public final class WheelView extends ViewGroup {
         //ItemCount为null时重新计算,亦防止重复计算
         Integer itemCounts;
 
-        //text画笔
-        private final Paint textPaint;
-        //分割线Paint
-        private final Paint dividerPaint;
-        //画文本居中时文本画笔的中心位置, 画居中文字时
-        private final float textFontCenter;
-
-        WheelViewAdapter(WheelParams wheelParams) {
+        public WheelAdapter(WheelParams wheelParams) {
             this.wheelParams = wheelParams;
-            textPaint = new Paint();
-            textPaint.setAntiAlias(true);
-            textPaint.setTextSize(wheelParams.textSize);
-            textPaint.setTextAlign(Paint.Align.CENTER);
-            Paint.FontMetrics fm = textPaint.getFontMetrics();
-            textFontCenter = (fm.bottom + fm.top) / 2.0f;
-
-            dividerPaint = new Paint();
-            dividerPaint.setAntiAlias(true);
-            dividerPaint.setStrokeWidth(wheelParams.dividerSize);
-            dividerPaint.setColor(wheelParams.dividerColor);
         }
 
         void refreshDataCounts() {
@@ -510,7 +525,7 @@ public final class WheelView extends ViewGroup {
         @Override
         public int getItemCount() {
             if (itemCounts == null) {
-                itemCounts = wheelParams.getShowItemCount() * 2 + (adapter == null ? 0 : adapter.getItemCount());
+                itemCounts = adapter == null ? 0 : adapter.getItemCount() + wheelParams.getShowItemCount() * 2;
             }
             return itemCounts;
         }
@@ -525,35 +540,73 @@ public final class WheelView extends ViewGroup {
                 view.setLayoutParams(new LayoutParams(wheelParams.itemSize, LayoutParams.MATCH_PARENT));
             }
             view.setVisibility(View.INVISIBLE);
-            return new RecyclerView.ViewHolder(view) {};
+            return new RecyclerView.ViewHolder(view) {
+            };
         }
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         }
 
+        @NonNull private String getItem(int position) {
+            if (adapter != null) return adapter.getItem(position);
+            return "";
+        }
+    }
+
+    /**
+     * 常用绘制器, 亦可重写此类
+     */
+    public static class SimpleItemPainter extends ItemPainter {
+        //text画笔
+        private final Paint textPaint = new TextPaint();
+        //分割线Paint
+        private final Paint dividerPaint = new Paint();
+        //画文本居中时文本画笔的中心位置, 画居中文字时
+        private float textFontCenter;
+
         @Override
-        public void drawItem(Canvas c, Rect itemRect, int alpha, int position) {
-            if (adapter != null) {
-                textPaint.setColor(wheelParams.textColor);
-                textPaint.setAlpha(alpha);
-                adapter.drawItem(c, textPaint, textFontCenter, itemRect, position, wheelParams);
-            }
+        protected void setWheelParams(@NonNull WheelParams params) {
+            super.setWheelParams(params);
+            textPaint.setAntiAlias(true);
+            textPaint.setTextAlign(Paint.Align.CENTER);
+            textPaint.setTextSize(params.textSize);
+            Paint.FontMetrics fm = textPaint.getFontMetrics();
+            textFontCenter = (fm.bottom + fm.top) / 2.0f;
+
+            dividerPaint.setAntiAlias(true);
+            dividerPaint.setStrokeWidth(params.dividerSize);
+            dividerPaint.setColor(params.dividerColor);
         }
 
         @Override
-        public void drawCenterItem(Canvas c, Rect itemRect, int alpha, int position) {
-            if (adapter != null) {
-                textPaint.setColor(wheelParams.textCenterColor);
-                textPaint.setAlpha(alpha);
-                adapter.drawItem(c, textPaint, textFontCenter, itemRect, position, wheelParams);
-            }
+        protected void drawItem(@NonNull Canvas c, @NonNull Rect itemRect, int alpha, @NonNull String item) {
+            textPaint.setColor(wheelParams.textColor);
+            textPaint.setAlpha(alpha);
+            c.drawText(item, itemRect.exactCenterX(), itemRect.exactCenterY() - textFontCenter, textPaint);
         }
 
         @Override
-        public void drawDivider(Canvas c, Rect wvRect) {
-            if (adapter != null) {
-                adapter.drawDivider(c, dividerPaint, wvRect, wheelParams);
+        protected void drawCenterItem(@NonNull Canvas c, @NonNull Rect itemRect, int alpha, @NonNull String item) {
+            textPaint.setColor(wheelParams.textCenterColor);
+            textPaint.setAlpha(alpha);
+            c.drawText(item, itemRect.exactCenterX(), itemRect.exactCenterY() - textFontCenter, textPaint);
+        }
+
+        @Override
+        protected void drawDivider(@NonNull Canvas c, @NonNull Rect parentRect) {
+            if (wheelParams.isVertical()) {
+                float dividerOff = (parentRect.height() - wheelParams.itemSize) / 2.0f;
+                float firstY = parentRect.top + dividerOff - wheelParams.dividerPadding;
+                c.drawLine(parentRect.left, firstY, parentRect.right, firstY, dividerPaint);
+                float secondY = parentRect.bottom - dividerOff + wheelParams.dividerPadding;
+                c.drawLine(parentRect.left, secondY, parentRect.right, secondY, dividerPaint);
+            } else {
+                float dividerOff = (parentRect.width() - wheelParams.itemSize) / 2.0f;
+                float firstX = parentRect.left + dividerOff - wheelParams.dividerPadding;
+                c.drawLine(firstX, parentRect.top, firstX, parentRect.bottom, dividerPaint);
+                float secondX = parentRect.right - dividerOff + wheelParams.dividerPadding;
+                c.drawLine(secondX, parentRect.top, secondX, parentRect.bottom, dividerPaint);
             }
         }
     }

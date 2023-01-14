@@ -11,10 +11,45 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+    signingConfigs {
+        debug {
+            keyAlias 'you'
+            keyPassword '123456'
+            storeFile file('you.jks')
+            storePassword '123456'
+        }
         release {
+            keyAlias 'you'
+            keyPassword '123456'
+            storeFile file('you.jks')
+            storePassword '123456'
+        }
+    }
+
+    buildTypes {
+        debug {
+            versionNameSuffix "-debug"
             minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+
+        release {
+            //是否启动混淆
+            minifyEnabled true
+            //Zipalign优化
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        android.applicationVariants.all { variant ->
+            variant.outputs.all {
+                outputFileName = "You_" + "v${variant.versionName}.apk"
+            }
         }
     }
 }

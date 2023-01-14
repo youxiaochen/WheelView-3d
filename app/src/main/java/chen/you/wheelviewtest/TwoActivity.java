@@ -4,12 +4,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import chen.you.wheel.SimpleDrawManager;
+import chen.you.wheel.LinearDrawManager;
 import chen.you.wheel.WheelDrawManager;
 import chen.you.wheel.WheelParams;
 import chen.you.wheel.WheelView;
@@ -35,6 +36,7 @@ public final class TwoActivity extends AppCompatActivity implements View.OnClick
         }
         adapter = new TestAdapter(tests);
         wv.setAdapter(adapter);
+        wv.setCurrentItem(10);
 
         findViewById(R.id.bt0).setOnClickListener(this);
         findViewById(R.id.bt1).setOnClickListener(this);
@@ -59,29 +61,30 @@ public final class TwoActivity extends AppCompatActivity implements View.OnClick
                 wv.setWheelParams(params);
                 break;
             case R.id.bt2:
-                if (wv.getDrawManager() instanceof SimpleDrawManager) {
+                if (wv.getDrawManager() instanceof LinearDrawManager) {
                     wv.setDrawManager(new WheelDrawManager());
                 } else {
-                    wv.setDrawManager(new SimpleDrawManager());
+                    wv.setDrawManager(new LinearDrawManager());
                 }
                 break;
             case R.id.bt3:
-                wv.setAdapter(new WheelView.WheelAdapter() {
-                    @Override
-                    public String getItemString(int position) {
-                        return "position " + position;
-                    }
-
+                wv.setAdapter(new WheelView.Adapter() {
                     @Override
                     public int getItemCount() {
                         return 100;
+                    }
+
+                    @NonNull
+                    @Override
+                    public String getItem(int position) {
+                        return "position " + position;
                     }
                 });
                 break;
         }
     }
 
-    static class TestAdapter extends WheelView.WheelAdapter {
+    static class TestAdapter extends WheelView.Adapter {
 
         List<String> strs;
 
@@ -95,7 +98,7 @@ public final class TwoActivity extends AppCompatActivity implements View.OnClick
         }
 
         @Override
-        public String getItemString(int position) {
+        public String getItem(int position) {
             return strs.get(position);
         }
     }

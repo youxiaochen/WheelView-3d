@@ -46,13 +46,13 @@ public class MainActivity extends AppCompatActivity {
         wv_city.addOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(WheelView wheelView, int index) {
-                tv_city.setText("市: "+cityAdapter.getItemString(index));
+                tv_city.setText("市: "+cityAdapter.getItem(index));
                 List<String> strs = Arrays.asList(TestDatas.AREAS[index]);
                 countyAdapter.strs.clear();
                 countyAdapter.strs.addAll(strs);
                 countyAdapter.notifyDataSetChanged();
                 wv_county.setCurrentItem(0);
-                tv_county.setText("县: "+countyAdapter.getItemString(0));
+                tv_county.setText("县: "+countyAdapter.getItem(0));
             }
         });
 
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         wv_county.addOnItemSelectedListener(new WheelView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(WheelView wheelView, int index) {
-                tv_county.setText("县: "+countyAdapter.getItemString(index));
+                tv_county.setText("县: "+countyAdapter.getItem(index));
             }
         });
 
@@ -69,27 +69,27 @@ public class MainActivity extends AppCompatActivity {
         wv_county.setAdapter(countyAdapter);
 
         /*  名字适配  */
-        wv_name.setAdapter(new WheelView.WheelAdapter() {
+        wv_name.setAdapter(new WheelView.Adapter() {
             @Override
             public int getItemCount() {
                 return 20;
             }
 
             @Override
-            public String getItemString(int position) {
+            public String getItem(int position) {
                 return "游小陈";
             }
         });
 
         /* 水平滑轮控件 */
-        wv_number.setAdapter(new WheelView.WheelAdapter() {
+        wv_number.setAdapter(new WheelView.Adapter() {
             @Override
             public int getItemCount() {
                 return 100;
             }
 
             @Override
-            public String getItemString(int position) {
+            public String getItem(int position) {
                 return String.valueOf(position);
             }
         });
@@ -111,19 +111,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private class CityAdapter extends WheelView.WheelAdapter {
+    private class CityAdapter extends WheelView.Adapter {
         @Override
         public int getItemCount() {
             return TestDatas.NAMES.length;
         }
 
         @Override
-        public String getItemString(int position) {
+        public String getItem(int position) {
             return TestDatas.NAMES[position];
         }
     }
 
-    private class CountyAdapter extends WheelView.WheelAdapter {
+    private class CountyAdapter extends WheelView.Adapter {
 
         private List<String> strs;
 
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public String getItemString(int position) {
+        public String getItem(int position) {
             return strs.get(position);
         }
     }

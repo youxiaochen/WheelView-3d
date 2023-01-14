@@ -1,25 +1,31 @@
 package chen.you.wheel;
 
 import android.graphics.Canvas;
+import android.graphics.Rect;
+
+import androidx.annotation.NonNull;
 
 /**
- * 普通绘制管理类,不处理旋转
+ * 线性Canvas装饰类, 不处理旋转, 可只处理alpha
  * Created by you on 2017/3/20.
  * 作QQ:86207610
  */
-public class SimpleDrawManager extends WheelView.DrawManager {
+public class LinearDrawManager extends WheelView.DrawManager {
 
     //用于计算item偏移值对应的alpha值
     private float maxCenterScrollOff;
+    //中心偏移值即为itemSize / 2
+    float centerItemScrollOff;
 
     @Override
-    void setWheelParams(WheelParams params) {
+    protected void setWheelParams(@NonNull WheelParams params) {
         super.setWheelParams(params);
         maxCenterScrollOff = (params.getShowItemCount() + 1) * params.itemSize;
+        centerItemScrollOff = params.itemSize / 2.f;
     }
 
     @Override
-    void drawItem(WheelView.WheelItemPainter painter, Canvas c, int adapterPosition) {
+    protected void decorationItem(@NonNull Canvas c, @NonNull Rect itemRect, int position, @NonNull String item) {
         float scrollOff; //相对中心的滑动偏移, 根据itemSize和偏移即可计算中离中心的比例和是否为中心item
         if (wheelParams.isVertical()) {
             scrollOff = wvRect.exactCenterY() - itemRect.exactCenterY();
@@ -35,7 +41,6 @@ public class SimpleDrawManager extends WheelView.DrawManager {
         }
 
         //中心计算
-        int position = adapterPosition - wheelParams.getShowItemCount();
         boolean isCenterItem = false;
         if (centerItemPosition == WheelView.IDLE_POSITION) {
             isCenterItem = Math.abs(scrollOff) <= centerItemScrollOff;
@@ -44,15 +49,9 @@ public class SimpleDrawManager extends WheelView.DrawManager {
             }
         }
         if (isCenterItem) {
-            painter.drawCenterItem(c, itemRect, alpha, position);
+            getItemPainter().drawCenterItem(c, itemRect, alpha, item);
         } else {
-            painter.drawItem(c, itemRect, alpha, position);
+            getItemPainter().drawItem(c, itemRect, alpha, item);
         }
-    }
-
-    //不处理
-    @Override
-    WheelParams.ItemShowOrder getShowOrder() {
-        return null;
     }
 }

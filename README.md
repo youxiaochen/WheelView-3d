@@ -1,5 +1,5 @@
 # WheelView-3d
-### Camera, Matrix 实现WheelView 3d效果
+### WheelView extends ViewGroup, Camera, Matrix 实现WheelView 3d效果
 
 ##使用
 ```
@@ -18,6 +18,8 @@ dependencies {
 ### 如果要实现比较复杂的任何布局方式整个childView旋转效果可以参考博客  http://www.jianshu.com/p/41e4602deca6
 
 ### 博客地址 http://www.jianshu.com/p/77656dbb07b2
+
+#### [测试包下载](imgs/demo.apk)
 
 ![纵向排列](imgs/GIF111.gif)
 
@@ -82,25 +84,28 @@ dependencies {
     app:wheelGradient="true"
     app:wheelDividerPadding="2dp"/>
 
+wheelView.setAdater(adapter)
 ```
 
-### 代码生成WheelView使用方式
+### 代码生成WheelView及更多使用方式, WheelParams, DrawManager, ItemPainter都有默认值可不设置
 ```
-WheelView wv = new WheelView(context);
 WheelParams params = new WheelParams.Builder()
         .setOrientation(WheelParams.HORIZONTAL)
         .setItemSize(...)
         .setTextColor(...)
+WheelView wv = new WheelView(context, params);
         ...
 //代码设置各种属性
-//亦可用此方式设置各属性  wv.getWheelParams().newBuilder().setOrientation(...) 
+//亦可用此方式设置各属性  
+wv.getWheelParams().newBuilder().setOrientation(...) 
 wv.setWheelParams(params);
-//设置绘制管理, 默认为WheelDrawManager产生3D旋转, 亦可设置SimpleDrawManager不旋转
+//设置绘制管理, 默认为WheelDrawManager产生3D旋转, 亦可设置LinearDrawManager不旋转, 也可自定义DrawManager扩展
 wv.setDrawManager(new WheelDrawManager());
-
-wv.setAdapter(new WheelView.WheelAdapter() {
+//设置绘制器, 默认为SimpleItemPainter,  也可自定义绘制器扩展
+wv.setItemPainter(...)  
+wv.setAdapter(new WheelView.Adapter() {
     @Override
-    protected String getItemString(int position) {
+    protected String getItem(int position) {
         return "position " + position;
     }
 
@@ -111,8 +116,6 @@ wv.setAdapter(new WheelView.WheelAdapter() {
 });
 
 adapter.notifyDataSetChanged() ...
-
-// 亦可 new WheelView.Adapter原始适配器扩展需求
 
 ```
 

@@ -262,6 +262,7 @@ public final class WheelView extends ViewGroup {
             mRecyclerView.addItemDecoration(mDrawManager);
         }
         mRecyclerView.setLayoutParams(createLayoutParams());
+        mWheelAdapter.refreshDataCounts();
         mWheelAdapter.notifyDataSetChanged();
     }
 
@@ -470,6 +471,7 @@ public final class WheelView extends ViewGroup {
             if (wheelParams == null || itemPainter == null) return;
             if (rv.getLayoutManager() == null || !(rv.getAdapter() instanceof WheelAdapter)) return;
             int wheelCount = rv.getLayoutManager().getItemCount() - wheelParams.getShowItemCount() * 2;
+            if (wheelCount <= 0) return;
             WheelAdapter adapter = (WheelAdapter) rv.getAdapter();
             wvRect.set(rv.getPaddingLeft(), rv.getPaddingTop(),
                     rv.getWidth() - rv.getPaddingRight(), rv.getHeight() - rv.getPaddingBottom());

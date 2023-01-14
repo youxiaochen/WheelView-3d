@@ -1,7 +1,7 @@
 # WheelView-3d
 ### WheelView extends ViewGroup, Camera, Matrix 实现WheelView 3d效果
 
-## 使用, 2.0.0版本有大改动, 使用1.0最后的版本号为 com.github.youxiaochen:WheelView-3d:1.3.0
+## 使用, 1.4.0版本有大改动, 使用1.4.1之前最新的版本号为 1.3.0
 ```
 allprojects {
     repositories {
@@ -11,7 +11,7 @@ allprojects {
 }
 
 dependencies {
-	implementation 'com.github.youxiaochen:WheelView-3d:2.0.0'
+	implementation 'com.github.youxiaochen:WheelView-3d:1.4.0'
 }
 ```
 

@@ -84,7 +84,17 @@ dependencies {
     app:wheelGradient="true"
     app:wheelDividerPadding="2dp"/>
 
-wheelView.setAdater(adapter)
+wv.setAdapter(new WheelView.Adapter() {
+    @Override
+    protected String getItem(int position) {
+        return "position " + position;
+    }
+
+    @Override
+    protected int getItemCount() {
+        return 100;
+    }
+});
 ```
 
 ### 代码生成WheelView及更多使用方式, WheelParams, DrawManager, ItemPainter都有默认值可不设置
@@ -103,20 +113,6 @@ wv.setWheelParams(params);
 wv.setDrawManager(new WheelDrawManager());
 //设置绘制器, 默认为SimpleItemPainter,  也可自定义绘制器扩展
 wv.setItemPainter(...)  
-wv.setAdapter(new WheelView.Adapter() {
-    @Override
-    protected String getItem(int position) {
-        return "position " + position;
-    }
-
-    @Override
-    protected int getItemCount() {
-        return 100;
-    }
-});
-
-adapter.notifyDataSetChanged() ...
-
 ```
 
 ### E-mail-QQ: 86207610@qq.com  W: 86207610   Welcome to star
